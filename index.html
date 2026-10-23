@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Code is solved, engineering is not</title>
+  </head>
+  <body class="audience">
+    <div id="stage" class="stage" role="img" aria-label="A miniature engineering workshop with a code machine, a control desk, a setup station, a branch rack, and an inspection table."></div>
+    <main class="caption" aria-live="polite">
+      <p class="chapter" id="chapter"></p>
+      <h1 id="title"></h1>
+      <p id="text"></p>
+    </main>
+    <nav class="controls" aria-label="Presentation">
+      <p class="status" id="status" role="status"></p>
+      <button id="prev" aria-label="Previous">←</button>
+      <select id="chapters" aria-label="Chapter"></select>
+      <button id="next" aria-label="Next">→</button>
+      <button id="follow"></button>
+    </nav>
+    <script type="module" src="/src/audience.ts"></script>
+  </body>
+</html>

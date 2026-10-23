@@ -1,0 +1,58 @@
+:root {
+  --paper: #f3ebdc;
+  --ink: #2a2420;
+  --brass: #d2a85a;
+  --bg: #221a15;
+  color-scheme: dark;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100dvh; background: var(--bg); color: var(--paper); }
+h1 { font-family: 'Iowan Old Style', Palatino, Georgia, serif; font-weight: 600; line-height: 1.1; }
+a { color: var(--brass); }
+.stage { position: fixed; inset: 0; touch-action: pan-y; }
+.stage canvas { display: block; cursor: grab; }
+.no-3d .stage { background: radial-gradient(circle at 50% 35%, #6b4a33, var(--bg) 70%); }
+.chapter { margin: 0; font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; color: #8a5a2b; }
+.caption {
+  position: fixed;
+  left: clamp(1rem, 4vw, 3rem);
+  bottom: clamp(1rem, 5vh, 3rem);
+  max-width: min(34rem, calc(100vw - 2rem));
+  padding: 1.25rem 1.5rem;
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 3px;
+  box-shadow: 0 1px 0 #fff8 inset, 0 18px 40px #0009;
+}
+.caption h1 { margin: 0.2rem 0 0.5rem; font-size: clamp(1.5rem, 3.2vw, 2.4rem); }
+.caption p:last-child { margin: 0; font-size: clamp(1rem, 1.5vw, 1.2rem); line-height: 1.45; }
+.controls { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.audience .controls { position: fixed; top: 1rem; right: 1rem; left: 1rem; justify-content: flex-end; }
+.status { flex-basis: 100%; margin: 0; text-align: right; font-size: 0.9rem; text-shadow: 0 1px 4px #000; }
+button, select {
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  color: var(--ink);
+  background: var(--paper);
+  cursor: pointer;
+}
+button:hover, select:hover { background: #fff; }
+:focus-visible { outline: 3px solid var(--brass); outline-offset: 2px; }
+.presenter .layout { display: grid; grid-template-columns: minmax(0, 3fr) minmax(22rem, 2fr); min-height: 100dvh; }
+.presenter .stage { position: relative; min-height: 50vh; }
+.desk { padding: 2rem; background: #2d241e; overflow: auto; }
+.desk .chapter { color: var(--brass); }
+.desk h1 { margin: 0.3rem 0 0.75rem; font-size: 2rem; }
+.desk h2 { margin: 1.75rem 0 0.4rem; font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--brass); }
+.current { font-size: 1.15rem; line-height: 1.45; }
+.notes { font-size: 1.3rem; line-height: 1.5; }
+.counter { opacity: 0.75; font-size: 0.9rem; }
+@media (max-width: 800px) {
+  .presenter .layout { grid-template-columns: 1fr; }
+  .presenter .stage { height: 45vh; }
+  .caption { left: 0.75rem; right: 0.75rem; bottom: 0.75rem; padding: 1rem 1.1rem; }
+}

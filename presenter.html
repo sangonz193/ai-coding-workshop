@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Presenter · Code is solved, engineering is not</title>
+  </head>
+  <body class="presenter">
+    <div class="layout">
+      <div id="stage" class="stage" aria-hidden="true"></div>
+      <main class="desk">
+        <p class="chapter" id="chapter"></p>
+        <h1 id="title"></h1>
+        <p id="text" class="current"></p>
+        <nav class="controls" aria-label="Presenter controls">
+          <button id="prev">Previous</button>
+          <button id="next">Next</button>
+          <select id="chapters" aria-label="Jump to chapter"></select>
+        </nav>
+        <p id="counter" class="counter"></p>
+        <h2>Speaker notes</h2>
+        <p id="notes" class="notes"></p>
+        <h2>Up next</h2>
+        <p id="upcoming"></p>
+        <p class="counter">Arrow keys, Space, or Page Up/Down move through reveals. The audience view is at <a href="/">/</a>.</p>
+      </main>
+    </div>
+    <script type="module" src="/src/presenter.ts"></script>
+  </body>
+</html>
