@@ -208,6 +208,47 @@ export const envTemplate: Paint = (g) => {
   text(g, 'Every variable, declared once', 40, h - 44, 26, '#5b564c')
 }
 
+export const sign = (label: string): Paint => (g) => {
+  const { width: w, height: h } = g.canvas
+  box(g, 0, 0, w, h, '#f6f3ec', 12)
+  g.font = `700 ${h * 0.5}px ${sans}`
+  text(g, label, (w - g.measureText(label).width) / 2, h * 0.68, h * 0.5, '#22252b', 700)
+}
+
+const nag: Msg[] = [[true, 'status?'], [true, 'status?'], [true, 'why did you stop working?'], [true, 'status?']]
+
+export const reviewLoop: Paint = (g, k, p) => {
+  const { width: w } = g.canvas
+  chrome(g, 'Paseo · orchestrator')
+  if (k === 3) {
+    chat(g, [[true, '/review-fix']], 40, 90, w - 80, 26)
+    ;[['Review', 'two reviewers'], ['Fix', 'one pass'], ['Confirm', 'one reviewer'], ['Leftovers', 'an issue, not another round']].forEach(([step, detail], i) => {
+      g.globalAlpha = Math.min(1, Math.max(0, p * 4 - i))
+      box(g, 40, 170 + i * 110, w - 80, 90, c.raised, 18)
+      text(g, '✓', 70, 228 + i * 110, 36, c.green, 700)
+      text(g, step, 130, 228 + i * 110, 34, c.text, 700)
+      text(g, detail, 400, 228 + i * 110, 30, c.muted)
+    })
+    g.globalAlpha = 1
+    return
+  }
+  const col = k >= 2 ? 640 : w - 80
+  let y = chat(g, [[true, '/loop-review fix the login redirect']], 40, 90, col, 24)
+  for (let r = 1; r <= (k === 0 ? 1 : k === 1 ? 1 + Math.round(p * 5) : 6); r++) {
+    box(g, 40, y, col, 50, c.raised, 14)
+    text(g, `Round ${r}: review found more, fixing`, 60, y + 34, 24, r === 6 ? c.amber : c.muted)
+    y += 62
+  }
+  if (k < 2) return
+  chat(g, nag, 720, 90, w - 760, 26)
+  g.globalAlpha = p
+  box(g, 720, 450, w - 760, 220, '#3a2f1a', 24)
+  text(g, 'You already do this work now,', 750, 520, 32, c.amber, 700)
+  text(g, 'just later and angrier.', 750, 570, 32, c.amber, 700)
+  text(g, 'AI review of my chats, Oct 16', 750, 635, 22, c.muted)
+  g.globalAlpha = 1
+}
+
 type Row = [lane: number, message: string]
 const rows: Row[] = [
   [0, 'Squash: nav fix'], [0, 'Squash: photo flow'], [1, 'Search: filters'], [0, 'Update dependencies'],

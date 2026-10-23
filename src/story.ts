@@ -39,6 +39,16 @@ export const scenes: Scene[] = [
     ],
   },
   {
+    chapter: 'Review',
+    title: 'More review, more jams',
+    steps: [
+      ['I built a review loop.', 'June: /loop-review. Build, have another provider review, and loop until approved. In August I raised the cap to six rounds.'],
+      ['It always found something.', 'Each fix gave the next round something new to review, and other work queued behind it. My October assessment of my own loops: round 1 caught real bugs, later rounds mostly did not, and about 40% of later-round blockers came from the loop’s own fixes. Exploratory numbers, not a controlled study.'],
+      ['“You already do this work now, just later and angrier.”', 'An AI reviewing my chats, Oct 16. I still changed 26 to 30% of approved loops, and long loops were where my “status?” messages and complaints piled up. Two days earlier another analysis counted about 340 frustrated messages across roughly 100 chats.'],
+      ['One review. One fix. One confirmation.', 'Oct 16: /loop-review became /review-fix. Whatever is left goes to an issue instead of another round.'],
+    ],
+  },
+  {
     chapter: 'Judgment',
     title: 'Removing a screen',
     steps: [
