@@ -28,7 +28,7 @@ The story and visual direction are still being developed.
 
 ## Workshop prototype
 
-A miniature engineering workshop rendered with three.js: the camera moves between stations (code machine, control desk, setup station, branch bench, inspection table) and pulls back to the whole workshop at the end.
+A miniature workshop rendered with three.js: the camera moves between desks whose laptops, monitors and phones show each part of the story on schematic interfaces (generated code piling up as pull requests, the Paseo workspace and a forked conversation, worktrees compiling their env files from committed templates, a branch graph being cleaned up, and the Eupersona review screen being removed), then pulls back to the whole workshop.
 
 ```sh
 pnpm install
