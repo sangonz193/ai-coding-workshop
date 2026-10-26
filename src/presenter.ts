@@ -2,7 +2,7 @@ import './style.css'
 import { $, deck } from './deck'
 import { indexOf, move, stops, type Position } from './state'
 import { answers, scenes } from './story'
-import { latest, onLive, publish } from './sync'
+import { join, latest, onLive, publish, supabase } from './sync'
 import { createWorkshop } from './workshop'
 
 const stage = createWorkshop($('stage'))
@@ -29,3 +29,21 @@ $('answers').append(
 )
 onLive(show)
 show(latest())
+
+const signin = $('signin') as HTMLFormElement
+const { data } = await supabase.auth.getSession()
+if (data.session) join(true)
+else {
+  signin.hidden = false
+  signin.onsubmit = async (e) => {
+    e.preventDefault()
+    const { error } = await supabase.auth.signInWithPassword({
+      email: ($('email') as HTMLInputElement).value,
+      password: ($('password') as HTMLInputElement).value,
+    })
+    $('signin-error').textContent = error?.message ?? ''
+    if (error) return
+    signin.hidden = true
+    join(true)
+  }
+}

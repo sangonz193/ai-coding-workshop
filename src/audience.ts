@@ -1,7 +1,7 @@
 import './style.css'
 import { $, deck } from './deck'
 import type { Position } from './state'
-import { latest, onLive } from './sync'
+import { join, latest, onLive } from './sync'
 import { createWorkshop } from './workshop'
 
 const stage = createWorkshop($('stage'))
@@ -18,7 +18,7 @@ function show(p: Position) {
   render(p)
   stage?.show(p)
   $('follow').textContent = following ? 'Explore on my own' : 'Rejoin live'
-  $('status').textContent = following ? 'Following the speaker' : 'Exploring on your own. Drag the workshop to look around.'
+  $('status').textContent = following ? 'Following the speaker' : 'Exploring on your own. Drag the desks to look around.'
 }
 
 $('follow').onclick = () => {
@@ -27,3 +27,4 @@ $('follow').onclick = () => {
 }
 onLive((p) => following && show(p))
 show(here)
+join()

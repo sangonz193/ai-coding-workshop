@@ -12,6 +12,12 @@
         <p class="chapter" id="chapter"></p>
         <h1 id="title"></h1>
         <p id="text" class="current"></p>
+        <form id="signin" class="controls" hidden>
+          <input id="email" type="email" aria-label="Email" placeholder="Email" autocomplete="username" required />
+          <input id="password" type="password" aria-label="Password" placeholder="Password" autocomplete="current-password" required />
+          <button>Sign in to drive the audience</button>
+          <p id="signin-error" class="counter" role="alert"></p>
+        </form>
         <nav class="controls" aria-label="Presenter controls">
           <button id="prev">Previous</button>
           <button id="next">Next</button>

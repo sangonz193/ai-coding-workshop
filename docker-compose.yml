@@ -1,0 +1,11 @@
+services:
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    # http2 transport: QUIC/UDP through Docker Desktop NAT breaks after macOS sleep
+    command: tunnel --protocol http2 run
+    environment:
+      - TUNNEL_TOKEN=${HARNESS_TRAINING_TUNNEL_TOKEN}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
