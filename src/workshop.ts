@@ -14,7 +14,8 @@ const spots = [[-11, -5], [0, -7], [11, -5], [11, 7], [0, 9], [-11, 7], [0, 1.5]
 const stationOf = [0, 1, 2, 4, 5, 6]
 const shots: Record<string, number[]> = {
   0: [0, 1, -0.8, 2],
-  1: [-2.6, 0.8, -0.1, 2.4], '1.2': [-1.4, 1.6, 0, 1.4], '1.3': [2.3, 0.8, 0.2, 2.4], '1.4': [-0.5, 1.3, -0.4, 1.3], '1.5': [-0.3, 1.9, -0.8, 2.6],
+  1: [-2.55, 0.62, -0.2, 3.7], '1.6': [-2.2, 1.4, 0.1, 1.9], '1.7': [-1.4, 1.6, 0, 1.4], '1.8': [2.3, 0.8, 0.2, 2.4],
+  '1.9': [-0.5, 1.3, -0.4, 1.3], '1.10': [-0.3, 1.9, -0.8, 2.6],
   2: [0.3, 0.8, -0.5, 1.35], '2.1': [-1.4, 0.9, -0.2, 1.9], '2.2': [0, 2.3, -0.6, 2, 3], '2.3': [0, 2.3, -0.6, 2, 3],
   3: [-0.2, 1, -0.1, 1.3], '3.2': [1.7, 1.9, -0.9, 2.3], '3.3': [0.6, 1, 0.1, 1.3],
   4: [-1.6, 0.9, 0.7, 2.1], '4.2': [0.2, 0.9, -0.2, 1.45], '4.3': [2.2, 0.95, -0.8, 2], '4.4': [0, 0.9, 0, 1.45],
@@ -91,7 +92,7 @@ export function createWorkshop(host: HTMLElement) {
     box(g, [w * 0.84, 0.01, d * 0.42], M.black, [0, 0.06, -d * 0.1])
     const lid = group(g, [0, 0.06, -d / 2], 0, -0.25)
     box(lid, [w, w * 0.64, 0.04], M.black, [0, 0, 0], new RoundedBoxGeometry(w, w * 0.64, 0.04, 2, 0.02))
-    mount(lid, display(scene, paint, w * 0.92, w * 0.56, 1024, live), [0, w * 0.32, 0.022])
+    mount(lid, display(scene, paint, w * 0.92, w * 0.56, 1024, live, 2.5), [0, w * 0.32, 0.022])
     return { g, lid }
   }
   const monitor = (parent: THREE.Object3D, pos: V3, scene: number, paint: S.Paint, w: number, seconds?: number) => {
@@ -136,19 +137,19 @@ export function createWorkshop(host: HTMLElement) {
   laptop(station(0), [0, 0.12, 0.1], 0, S.generating, 2.6, 0, true)
 
   const desk = station(1, 7)
-  prop(laptop(desk, [-2.6, 0.12, 0.5], 1, S.vscode, 1.9, 0.3).lid, 0, { turn: [at(1, 4), Math.PI / 2] })
+  prop(laptop(desk, [-2.6, 0.12, 0.5], 1, S.vscode, 1.9, 0.1).lid, 0, { turn: [at(1, 9), Math.PI / 2] })
   for (let i = 0; i < 10; i++) {
     const pos: V3 = [-2.9 + (i % 5) * 0.8, 1.05 + Math.floor(i / 5) * 0.8 + (i % 2) * 0.12, 0.3 - i * 0.05]
     const pane = group(desk, pos, ((i % 3) - 1) * 0.15)
     box(pane, [1.15, 0.72, 0.02], M.black, [0, -0.36, 0])
     mount(pane, display(1, S.vscodeWindow(i), 1.12, 0.69, 512), [0, 0, 0.012])
-    prop(pane, at(1, 2), { to: at(1, 4), lift: -0.3, shift: [at(1, 4), [-0.3 - pos[0], 1.9 - pos[1], -0.8 - pos[2]]] })
+    prop(pane, at(1, i < 3 ? 6 : 7), { to: at(1, 9), lift: -0.3, shift: [at(1, 9), [-0.3 - pos[0], 1.9 - pos[1], -0.8 - pos[2]]] })
   }
   const own = laptop(desk, [2.2, 0.12, 0.6], 1, S.remoteCoding, 1.8, -0.4)
-  prop(own.g, at(1, 3), { lift: 0.8 })
-  prop(own.lid, 0, { turn: [at(1, 4), Math.PI / 2] })
-  prop(phone(desk, [1.15, 0.12, 1.3], 1, S.codePhone, 1.1), at(1, 3), { to: at(1, 4), lift: -0.5 })
-  prop(monitor(desk, [-0.3, 0.12, -0.8], 1, S.paseo, 3, 3.5), at(1, 4), { lift: -1.2 })
+  prop(own.g, at(1, 8), { lift: 0.8 })
+  prop(own.lid, 0, { turn: [at(1, 9), Math.PI / 2] })
+  prop(phone(desk, [1.15, 0.12, 1.3], 1, S.codePhone, 1.1), at(1, 8), { to: at(1, 9), lift: -0.5 })
+  prop(monitor(desk, [-0.3, 0.12, -0.8], 1, S.paseo, 3, 3.5), at(1, 9), { lift: -1.2 })
 
   const copies = station(2, 8)
   const env = group(copies, [-3.2, 0.12, 0.6], 0.2)

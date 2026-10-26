@@ -3,8 +3,8 @@ import { find, move, stops } from './state'
 
 test('steps through reveals, then across chapters', () => {
   expect(move({ scene: 1, step: 0 }, 1)).toEqual({ scene: 1, step: 1 })
-  expect(move({ scene: 1, step: 5 }, 1)).toEqual({ scene: 2, step: 0 })
-  expect(move({ scene: 2, step: 0 }, -1)).toEqual({ scene: 1, step: 5 })
+  expect(move({ scene: 1, step: 10 }, 1)).toEqual({ scene: 2, step: 0 })
+  expect(move({ scene: 2, step: 0 }, -1)).toEqual({ scene: 1, step: 10 })
 })
 
 test('stays put at either end', () => {

@@ -166,7 +166,7 @@ function paseoFrame(g: G, branch: string, tabs: [string, string, boolean][], mod
 const trunk: Item[] = [['user', 'Add dark mode to settings'], ['tool', 'Edit  apps/web/src/settings/theme.tsx'], ['tool', 'Shell  bun test settings'], ['ai', 'Added a theme toggle, dark colors and a saved preference.']]
 
 export const paseo: Paint = (g, k, p) => {
-  const forked = phase(k, 5, p) > 0.5
+  const forked = phase(k, 10, p) > 0.5
   const tabs: [string, string, boolean][] = [['◎', 'Add dark mode', !forked]]
   if (forked) tabs.push(['✳', 'Add dark mode', true])
   const area = paseoFrame(g, 'dark-mode-settings', tabs, forked ? 'Opus 5.5  ·  high' : 'GPT-6.1-Sol  ·  medium')
@@ -183,7 +183,7 @@ export const paseo: Paint = (g, k, p) => {
     )
     text(g, 'gitignored', fx + 180, 244, 15, ps.muted, 400)
   }
-  if (k !== 5 || forked) return
+  if (k !== 10 || forked) return
   box(g, area.x + 60, y + 4, 330, 136, '#1b1b1b', 12)
   g.strokeStyle = ps.line
   g.strokeRect(area.x + 60, y + 4, 330, 136)
@@ -214,28 +214,72 @@ export const codePhone: Paint = (g) => {
   text(g, 'Message', s * 1.2, h - s * 2.2, size, '#737373', 400)
 }
 
-const vsFiles = ['EUPERSONA', '  apps/web', '    settings', '      theme.tsx', '    intake', '  package.json']
+const vsFiles = ['EUPERSONA', '  settings', '    theme.tsx', '    settings.tsx', '  auth', '    login.tsx', '    session.ts']
+const theme = ['export function Theme() {', '  const [dark, setDark] = useDark()', '  return (', '    <Toggle checked={dark}', '      onChange={setDark} />', '  )', '}']
 
-export const vscode: Paint = (g, k) => {
+function vsPanel(g: G, title: string, x: number, y: number, w: number, items: Item[]) {
+  text(g, title, x, y, 16, '#bbbbbb', 700)
+  transcript(g, items, x, y + 18, w, 17)
+}
+
+export const vscode: Paint = (g, k, p) => {
   const { width: w, height: h } = g.canvas
   box(g, 0, 0, w, h, '#1e1e1e')
   box(g, 0, 0, w, 34, '#3c3c3c')
   text(g, 'theme.tsx · eupersona', w / 2 - 100, 23, 16, '#cccccc', 400)
   box(g, 0, 34, 48, h - 34, '#333333')
   box(g, 48, 34, 200, h - 34, '#252526')
-  vsFiles.forEach((f, i) => text(g, f, 58, 64 + i * 28, 15, i === 3 ? '#ffffff' : '#cccccc', i ? 400 : 700))
-  const right = k >= 1 ? 330 : 0
-  const theme = ['export function Theme() {', '  const [dark, setDark] = useDark()', '  return (', '    <Toggle checked={dark}', '      onChange={setDark} />', '  )', '}']
-  clipped(g, 248, 34, w - right - 260, h - 34, () => code(g, theme, 262, 70, 17))
+  vsFiles.forEach((f, i) => {
+    text(g, f, 58, 64 + i * 28, 16, i === 2 ? '#ffffff' : '#cccccc', i ? 400 : 700)
+    if (k >= 5 && i % 3 && i) text(g, 'M', 226, 64 + i * 28, 15, '#e2c08d', 700)
+  })
+  box(g, 0, h - 26, w, 26, '#007acc')
+  text(g, k >= 3 ? '⎇ main*' : '⎇ main', 14, h - 8, 15, '#ffffff', 500)
+  if (k >= 5) {
+    box(g, 26, 118, 22, 22, '#007acc', 11)
+    text(g, '14', 29, 135, 13, '#ffffff', 700)
+  }
+  const right = k >= 2 ? 340 : 0
+  const fs = right ? 17 : 19
+  const lh = fs * 1.55
+  const typed = k === 0 ? Math.floor(p * 4 * 30) : Infinity
+  let budget = typed
+  const lines = theme.slice(0, k === 0 ? 4 : k === 1 ? 4 : 7).map((line) => {
+    const shown = line.slice(0, Math.max(0, budget))
+    budget -= line.length
+    return shown
+  })
+  clipped(g, 248, 34, w - right - 260, h - 60, () => {
+    if (k >= 3) lines.forEach((_, i) => i > 0 && i < 5 && box(g, 248, 76 - fs + 2 + i * lh, w - right - 248, lh - 2, '#1f3a26'))
+    if (k >= 5) [2, 3].forEach((i) => box(g, 248, 76 - fs + 2 + i * lh, w - right - 248, lh - 2, '#1e3350'))
+    code(g, lines, 262, 76, fs)
+    if (k === 1) text(g, theme[4].trim(), 262 + 19 * 2.4 + 6 * 11.4, 76 + 4 * 29.5, 19, '#6a6a6a', 400, mono)
+  })
+  if (k === 0) box(g, 262 + 19 * 2.4 + (lines[lines.length - 1]?.length ?? 0) * 11.4, 62 + Math.max(0, lines.filter(Boolean).length - 1) * 29.5, 2, 20, '#aeafad')
+  if (k === 1) {
+    box(g, w - 200, 80, 170, 34, '#252526', 6)
+    text(g, 'Tab to accept', w - 186, 103, 16, '#cccccc', 500)
+  }
   if (!right) return
-  box(g, w - right, 34, right, h - 34, '#252526')
-  ;['Copilot', 'Claude', 'Codex'].reduce((x, tab, i) => text(g, tab, x, 62, 15, i ? '#8b8b8b' : '#ffffff', 600) + 18, w - right + 14)
-  box(g, w - right + 12, 84, right - 24, 54, '#2d2d30', 8)
-  text(g, 'Add dark mode to settings', w - right + 22, 116, 15, '#d4d4d4', 400)
-  text(g, 'Working on it…', w - right + 14, 168, 15, '#cccccc', 400)
-  box(g, w - right + 12, h - 70, right - 24, 50, '#3c3c3c', 8)
-  text(g, 'Ask a question', w - right + 24, h - 39, 14, '#8b8b8b', 400)
-  box(g, w - 62, h - 58, 26, 26, '#cccccc', 4)
+  const x = w - right
+  box(g, x, 34, right, h - 60, '#252526')
+  if (k === 2) {
+    vsPanel(g, 'CHAT', x + 16, 64, right - 32, [['user', 'How do I persist a toggle?'], ['ai', 'Save it in localStorage:']])
+    box(g, x + 16, 170, right - 32, 64, '#1e1e1e', 6)
+    text(g, "localStorage.setItem('dark', v)", x + 26, 208, 15, '#9cdcfe', 400, mono)
+    return
+  }
+  if (k <= 4) {
+    const done: Item[] = k === 3 ? [['tool', 'Edited theme.tsx'], ['tool', 'Edited settings.tsx'], ['tool', 'Ran tests'], ['ai', 'Done.']] : [['tool', 'Edited theme.tsx'], ['ai', 'Working…']]
+    vsPanel(g, 'AGENT', x + 16, 64, right - 32, [['user', 'Add dark mode to settings'], ...done])
+    box(g, x + 12, h - 96, right - 24, 54, '#3c3c3c', 8)
+    text(g, 'Ask the agent', x + 24, h - 63, 15, '#8b8b8b', 400)
+    if (k === 4) box(g, w - 54, h - 82, 24, 24, '#cccccc', 4)
+    return
+  }
+  vsPanel(g, 'AGENT 1 · dark mode', x + 16, 64, right - 32, [['tool', 'Editing theme.tsx']])
+  vsPanel(g, 'AGENT 2 · login redirect', x + 16, 190, right - 32, [['tool', 'Editing theme.tsx'], ['tool', 'Editing session.ts']])
+  vsPanel(g, 'AGENT 3 · search', x + 16, 346, right - 32, [['tool', 'Editing settings.tsx']])
 }
 
 const worktreeNames = ['main', 'dark-mode', 'card-photos', 'nav-fix', 'search', 'login-redirect', 'orchestrator', 'worktree-2', 'envwire · main', 'git-nav · main']
