@@ -7,7 +7,7 @@ import { scenes } from './story'
 type V3 = [number, number, number]
 type Opts = { to?: number; lift?: number; shift?: [number, V3]; turn?: [number, number]; tick?: (o: THREE.Object3D, t: number) => void }
 type Prop = Required<Pick<Opts, 'to' | 'lift'>> & Opts & { obj: THREE.Object3D; from: number; home: THREE.Vector3; tilt: number }
-type Screen = { g: CanvasRenderingContext2D; map: THREE.CanvasTexture; scene: number; paint: S.Paint; live: boolean; seconds: number; k: number; since: number; p: number }
+type Screen = { g: CanvasRenderingContext2D; map: THREE.CanvasTexture; scene: number; paint: S.Paint; live: boolean; seconds: number; k: number; active: boolean; since: number; p: number }
 
 const at = (scene: number, step = 0) => indexOf({ scene, step })
 const spots = [[-11, -5], [0, -7], [11, -5], [11, 7], [0, 9], [-11, 7], [0, 1.5]]
@@ -71,7 +71,7 @@ export function createWorkshop(host: HTMLElement) {
     const map = new THREE.CanvasTexture(canvas)
     map.colorSpace = THREE.SRGBColorSpace
     map.anisotropy = 8
-    screens.push({ g: canvas.getContext('2d')!, map, scene, paint, live, seconds, k: -1, since: 0, p: -1 })
+    screens.push({ g: canvas.getContext('2d')!, map, scene, paint, live, seconds, k: -1, active: false, since: 0, p: -1 })
     return new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map, toneMapped: false }))
   }
   const group = (parent: THREE.Object3D, [x, y, z]: V3, ry = 0, rx = 0) => {
@@ -243,8 +243,10 @@ export function createWorkshop(host: HTMLElement) {
     }
     for (const s of screens) {
       const step = s.scene < pos.scene ? scenes[s.scene].steps.length - 1 : s.scene > pos.scene ? 0 : pos.step
-      if (step !== s.k) Object.assign(s, { k: step, since: t })
-      const p = reduced.matches ? 1 : Math.min(1, (t - s.since) / s.seconds)
+      const active = s.scene === pos.scene
+      // start after the camera lands: a longer wait when it travels from another desk
+      if (step !== s.k || active !== s.active) Object.assign(s, { k: step, since: active ? t + (s.active ? 0.4 : 1.4) : -Infinity, active })
+      const p = reduced.matches ? 1 : Math.min(1, Math.max(0, (t - s.since) / s.seconds))
       if (p === s.p && !(s.live && !reduced.matches)) continue
       s.p = p
       s.paint(s.g, step, p * p * (3 - 2 * p), reduced.matches ? 3 : t)
