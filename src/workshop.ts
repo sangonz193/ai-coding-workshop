@@ -189,24 +189,24 @@ export function createWorkshop(host: HTMLElement) {
   const jam = station(4, 8)
   monitor(jam, [1.7, 0.12, -0.9], 3, S.reviewLoop, 2.8)
   const hub = new THREE.Vector3(-1.4, 0.2, 0.1)
-  prop(box(jam, [0, 0.06, 0], M.brass, [hub.x, 0.14, hub.z], new THREE.TorusGeometry(1, 0.05, 12, 64).rotateX(Math.PI / 2)), 0, { to: at(3, 3) })
-  for (const [label, dx] of [['Review', 1.8], ['Fix', -1.8]] as const) {
+  prop(box(jam, [0, 0.06, 0], M.brass, [hub.x, 0.14, hub.z], new THREE.TorusGeometry(0.85, 0.05, 12, 64).rotateX(Math.PI / 2)), 0, { to: at(3, 3) })
+  for (const [label, dx] of [['Review', 2.1], ['Fix', -2.1]] as const) {
     const post = group(jam, [hub.x + dx, 0.12, hub.z - 0.2])
     box(post, [0.8, 0.36, 0.03], M.card, [0, 0, 0])
     mount(post, display(3, S.sign(label), 0.76, 0.32, 256), [0, 0.18, 0.016])
     prop(post, 0, { to: at(3, 3) })
   }
   const spin = (o: THREE.Object3D, t: number) => {
-    o.position.set(hub.x + Math.cos(t * 1.2), 0.2, hub.z + Math.sin(t * 1.2))
+    o.position.set(hub.x + Math.cos(t * 1.2) * 0.85, 0.2, hub.z + Math.sin(t * 1.2) * 0.85)
     o.rotation.y = -t * 1.2
   }
-  prop(card(jam, 3, 'Fix login redirect', [hub.x + 1, 0.2, hub.z], 0.9), 0, { to: at(3, 3), tick: spin })
+  prop(card(jam, 3, 'Fix login redirect', [hub.x + 0.85, 0.2, hub.z], 0.75), 0, { to: at(3, 3), tick: spin })
   for (let i = 0; i < 6; i++) {
     const title = ['Dark mode', 'Search filters', 'Nav fix', 'Export to CSV', 'Onboarding', 'Auth refactor'][i]
-    const waiting = card(jam, 3, title, [-3.4 + i * 0.75, 0.12 + (i % 2) * 0.035, 1.65], 0.9, (i % 2 ? 0.12 : -0.1))
+    const waiting = card(jam, 3, title, [-3.4 + i * 0.8, 0.12, 1.75], 0.7, (i % 2 ? 0.06 : -0.06))
     prop(waiting, at(3, 1), { lift: 1 + i * 0.25, shift: [at(3, 3), [2.6, 0, 0]] })
   }
-  prop(box(jam, [7, 0.02, 0.08], M.brass, [0, 0.12, 1.65]), at(3, 3), { lift: -0.2 })
+  prop(box(jam, [7, 0.02, 0.08], M.brass, [0, 0.12, 1.75]), at(3, 3), { lift: -0.2 })
 
   const flow = station(5, 7)
   prop(phone(flow, [-3, 0.12, 0.8], 4, S.capture, 1.5), 0, { shift: [at(4, 1), [0.7, 0, 0]] })
