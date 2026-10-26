@@ -296,8 +296,9 @@ export function createWorkshop(host: HTMLElement) {
     const reach = Math.cos(view.pitch) * 40
     camera.position.set(focus.x + Math.sin(view.turn) * reach, focus.y + Math.sin(view.pitch) * 40, focus.z + Math.cos(view.turn) * reach)
     camera.lookAt(focus)
-    // The shadow map only covers what is on screen, so close-ups get sharp shadows and the overview still fits.
-    const lit = THREE.MathUtils.clamp(9 / camera.zoom, 4, 26)
+    // The shadow map only covers what is on screen (the ground stretches by 1/sin(pitch) under the tilted camera),
+    // so close-ups get sharp shadows and the overview still fits.
+    const lit = THREE.MathUtils.clamp((Math.hypot(camera.right, camera.top / Math.sin(view.pitch)) / camera.zoom) * 1.15 + 1, 4, 32)
     sun.position.copy(focus).add(sunOffset)
     sun.target.position.copy(focus)
     Object.assign(sun.shadow.camera, { left: -lit, right: lit, top: lit, bottom: -lit })
