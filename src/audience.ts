@@ -1,7 +1,7 @@
 import './style.css'
 import { $, deck } from './deck'
 import type { Position } from './state'
-import { latest, onLive } from './sync'
+import { join, latest, onLive } from './sync'
 import { createWorkshop } from './workshop'
 
 const stage = createWorkshop($('stage'))
@@ -27,3 +27,4 @@ $('follow').onclick = () => {
 }
 onLive((p) => following && show(p))
 show(here)
+join()

@@ -40,6 +40,8 @@ button, select {
   background: var(--paper);
   cursor: pointer;
 }
+form[hidden] { display: none; }
+input { min-height: 44px; padding: 0.5rem 1rem; border: 0; border-radius: 999px; font: inherit; }
 button:hover, select:hover { background: #fff; }
 :focus-visible { outline: 3px solid var(--brass); outline-offset: 2px; }
 .presenter .layout { display: grid; grid-template-columns: minmax(0, 3fr) minmax(22rem, 2fr); height: 100dvh; overflow: hidden; }

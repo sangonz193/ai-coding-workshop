@@ -38,6 +38,15 @@ pnpm dev        # http://localhost:4313
 - `/` is the audience view. It follows the presenter, can switch to independent exploration, and can rejoin the live scene.
 - `/presenter.html` has previous/next, chapter selection, step reveals, speaker notes, the next caption, and prepared answers to likely audience questions.
 
-Presenter and audience tabs synchronize within one browser using `BroadcastChannel`, and the latest scene is kept in `localStorage` so late joiners land on it.
+The presenter's position is shared through a private Supabase Realtime channel using presence, so audience devices that join late land on the current step. Anyone can follow; only signed-in users can move the talk, and signups are disabled.
 
-`pnpm test` covers scene navigation; `pnpm build` type-checks and builds both pages.
+## Running it live
+
+Supabase runs locally in Docker and is reached through one Cloudflare tunnel with two routes: `harness-training.sgonzalez.dev` → `http://host.docker.internal:4313` and `harness-training-api.sgonzalez.dev` → `http://host.docker.internal:59321`.
+
+1. Copy `.env.example` to `.env` and fill in the tunnel token and the publishable key.
+2. Create `supabase/.env` with `SUPABASE_AUTH_JWT_SECRET` (`openssl rand -hex 32`) and `SUPABASE_AUTH_SECRET_KEY` (`sb_secret_` followed by random characters), and generate `supabase/signing_keys.json` with `echo '[]' > supabase/signing_keys.json && pnpm exec supabase gen signing-key --algorithm ES256 --append`. The CLI defaults for these are public, so the API must not be exposed without them.
+3. `pnpm exec supabase start`, then `pnpm presenter` once to create a presenter account.
+4. `docker compose up -d` starts the tunnel; `pnpm build && pnpm preview` serves the app.
+
+`pnpm test` covers scene navigation and choosing the live position; `pnpm build` type-checks and builds both pages.
