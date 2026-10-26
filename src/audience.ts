@@ -21,9 +21,9 @@ function show(p: Position, qr = false) {
   document.body.classList.toggle('joining', p === welcome)
   document.body.classList.toggle('qr', qr)
   render(p)
-  stage?.show(p)
+  stage?.show(p, following)
   $('follow').textContent = following ? 'Explore on my own' : 'Rejoin live'
-  $('status').textContent = following ? 'Following the speaker' : 'Exploring on your own. Drag the desks to look around.'
+  $('status').textContent = following ? 'Following the speaker' : 'Exploring on your own. Drag to turn, scroll or pinch to zoom.'
 }
 
 $('follow').onclick = () => {

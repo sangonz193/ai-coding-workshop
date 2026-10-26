@@ -221,12 +221,42 @@ export function createWorkshop(host: HTMLElement) {
     Object.assign(camera, { left: -halfW, right: halfW, top: (halfW * h) / w, bottom: (-halfW * h) / w })
     camera.setViewOffset(w, h, w > h ? -w * 0.1 : 0, 0, w, h)
   }).observe(host)
-  host.addEventListener('pointerdown', (e) => void (dragX = e.clientX))
-  addEventListener('pointerup', () => void (dragX = null))
+  let userZoom = 1
+  const zoomBy = (factor: number) => void (userZoom = Math.min(3, Math.max(0.5, userZoom * factor)))
+  const touches = new Map<number, [number, number]>()
+  let pinch = 0
+  host.addEventListener('pointerdown', (e) => {
+    touches.set(e.pointerId, [e.clientX, e.clientY])
+    dragX = touches.size === 1 ? e.clientX : null
+  })
+  for (const type of ['pointerup', 'pointercancel'] as const)
+    addEventListener(type, (e) => {
+      touches.delete(e.pointerId)
+      dragX = null
+      pinch = 0
+    })
   host.addEventListener('pointermove', (e) => {
+    if (touches.has(e.pointerId)) touches.set(e.pointerId, [e.clientX, e.clientY])
+    if (touches.size === 2) {
+      const [[ax, ay], [bx, by]] = [...touches.values()]
+      const distance = Math.hypot(ax - bx, ay - by)
+      if (pinch) zoomBy(distance / pinch)
+      pinch = distance
+      return
+    }
     if (dragX === null) return
     drag = Math.min(0.9, Math.max(-0.9, drag - (e.clientX - dragX) * 0.005))
     dragX = e.clientX
+  })
+  // Trackpad pinches arrive as wheel events with ctrlKey set and need a stronger response than mouse wheels.
+  host.addEventListener('wheel', (e) => {
+    e.preventDefault()
+    zoomBy(Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0015)))
+  }, { passive: false })
+  addEventListener('keydown', (e) => {
+    if (e.target instanceof HTMLInputElement || e.metaKey || e.ctrlKey) return
+    if (e.key === '+' || e.key === '=') zoomBy(1.2)
+    if (e.key === '-' || e.key === '_') zoomBy(1 / 1.2)
   })
 
   let last = 0
@@ -258,7 +288,7 @@ export function createWorkshop(host: HTMLElement) {
       s.map.needsUpdate = true
     }
     focus.lerp(goal, k * 0.6)
-    camera.zoom = THREE.MathUtils.lerp(camera.zoom, goalZoom, k * 0.6)
+    camera.zoom = THREE.MathUtils.lerp(camera.zoom, goalZoom * userZoom, k * 0.6)
     view.turn = THREE.MathUtils.lerp(view.turn, goalView.turn + drag, k * 0.6)
     view.pitch = THREE.MathUtils.lerp(view.pitch, goalView.pitch, k * 0.6)
     const reach = Math.cos(view.pitch) * 40
@@ -269,7 +299,11 @@ export function createWorkshop(host: HTMLElement) {
   })
 
   return {
-    show(p: Position) {
+    show(p: Position, reset = true) {
+      if (reset) {
+        drag = 0
+        userZoom = 1
+      }
       pos = p
       previous = current
       current = indexOf(p)
