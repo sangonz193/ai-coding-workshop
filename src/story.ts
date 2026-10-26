@@ -5,8 +5,7 @@ export const scenes: Scene[] = [
     chapter: 'Output',
     title: 'Code is solved.',
     steps: [
-      ['Ask, and the code appears.', 'Let the editor stream for a beat. Producing code is the cheap part now.'],
-      ['Output is easy. Delivery isn’t.', 'Pull requests pile up. The bottleneck moved to everything around the code: where work happens, setup, upkeep, and deciding what is actually done.'],
+      ['Ask, and the code appears.', 'Let the editor stream for a beat. Producing code is the cheap part now; the rest of this talk is everything around it: where the work happens, setup, upkeep, review, and deciding what is actually done.'],
     ],
   },
   {
