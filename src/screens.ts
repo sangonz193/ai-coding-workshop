@@ -140,13 +140,13 @@ function paseoFrame(g: G, branch: string, tabs: [string, string, boolean][], mod
 const trunk: Item[] = [['user', 'Add dark mode to settings'], ['tool', 'Edit  apps/web/src/settings/theme.tsx'], ['tool', 'Shell  bun test settings'], ['ai', 'Added a theme toggle, dark colors and a saved preference.']]
 
 export const paseo: Paint = (g, k, p) => {
-  const forked = phase(k, 2, p) > 0.5
+  const forked = phase(k, 5, p) > 0.5
   const tabs: [string, string, boolean][] = [['◎', 'Add dark mode', !forked]]
   if (forked) tabs.push(['✳', 'Add dark mode', true])
   const area = paseoFrame(g, 'dark-mode-settings', tabs, forked ? 'Opus 5.5  ·  high' : 'GPT-6.1-Sol  ·  medium')
   const y = transcript(g, trunk, area.x, area.y, area.w, 22)
   if (forked) transcript(g, [['user', 'Review what changed'], ['ai', 'Two buttons fail contrast in dark mode.']], area.x, y + 10, area.w, 22)
-  if (k !== 2 || forked) return
+  if (k !== 5 || forked) return
   box(g, area.x + 60, y + 4, 330, 120, '#1b1b1b', 12)
   g.strokeStyle = ps.line
   g.strokeRect(area.x + 60, y + 4, 330, 120)
@@ -190,6 +190,74 @@ export const remote = (kind: 'ios' | 'android' | 'browser' | 'code'): Paint => (
   box(g, s * 0.6, h - s * 3.6, w - s * 1.2, s * 2.8, '#141414', s * 0.6)
   text(g, 'Message, @files, /commands', s * 1.2, h - s * 2.5, size * 0.85, ps.muted, 400)
   text(g, 'GPT-6.1-Sol', s * 1.2, h - s * 1.4, size * 0.85, ps.text, 500)
+}
+
+const vsFiles = ['EUPERSONA', '  apps/web', '    settings', '      theme.tsx', '    intake', '  package.json']
+
+export const vscode: Paint = (g, k) => {
+  const { width: w, height: h } = g.canvas
+  box(g, 0, 0, w, h, '#1e1e1e')
+  box(g, 0, 0, w, 34, '#3c3c3c')
+  text(g, 'theme.tsx · eupersona', w / 2 - 100, 23, 16, '#cccccc', 400)
+  box(g, 0, 34, 48, h - 34, '#333333')
+  box(g, 48, 34, 200, h - 34, '#252526')
+  vsFiles.forEach((f, i) => text(g, f, 58, 64 + i * 28, 15, i === 3 ? '#ffffff' : '#cccccc', i ? 400 : 700))
+  const right = k >= 1 ? 330 : 0
+  code(g, ["export function Theme() {", "  const [dark, setDark] = useState(false)", "  return (", "    <Toggle checked={dark}", "      onChange={setDark} />", "  )", "}"], 262, 70, 17)
+  if (!right) return
+  box(g, w - right, 34, right, h - 34, '#252526')
+  ;['Copilot', 'Claude', 'Codex'].reduce((x, tab, i) => text(g, tab, x, 62, 15, i ? '#8b8b8b' : '#ffffff', 600) + 18, w - right + 14)
+  box(g, w - right + 12, 84, right - 24, 54, '#2d2d30', 8)
+  text(g, 'Add dark mode to settings', w - right + 22, 116, 15, '#d4d4d4', 400)
+  text(g, 'Working on it…', w - right + 14, 168, 15, '#cccccc', 400)
+  box(g, w - right + 12, h - 70, right - 24, 50, '#3c3c3c', 8)
+  text(g, 'Ask a question', w - right + 24, h - 39, 14, '#8b8b8b', 400)
+  box(g, w - 62, h - 58, 26, 26, '#cccccc', 4)
+}
+
+const worktreeNames = ['main', 'dark-mode', 'card-photos', 'nav-fix', 'search', 'login-redirect', 'orchestrator', 'worktree-2', 'envwire · main', 'git-nav · main']
+
+export const vscodeWindow = (i: number): Paint => (g) => {
+  const { width: w, height: h } = g.canvas
+  box(g, 0, 0, w, h, '#1e1e1e')
+  box(g, 0, 0, w, 40, '#3c3c3c')
+  ;['#ec6a5e', '#f4bf4f', '#61c554'].forEach((f, j) => box(g, 14 + j * 22, 13, 13, 13, f, 7))
+  text(g, `eupersona · ${worktreeNames[i]}`, 92, 27, 18, '#cccccc', 400)
+  box(g, 0, 40, 34, h - 40, '#333333')
+  box(g, 34, 40, 140, h - 40, '#252526')
+  for (let j = 0; j < 7; j++) box(g, 196, 66 + j * 30, 120 + ((i * 37 + j * 53) % 240), 12, j % 3 ? '#3a6ea5' : '#9cdcfe', 6)
+}
+
+export const zen: Paint = (g, k, p) => {
+  const { width: w, height: h } = g.canvas
+  box(g, 0, 0, w, h, '#151515')
+  const merge = k < 7 ? 0 : Math.min(1, p / 0.6)
+  ;[['W', '#2563eb', 'Gmail'], ['P', '#ea580c', 'Calendar'], ['E', '#16a34a', 'Supabase'], ['H', '#9333ea', 'Drive']].forEach(([letter, color, title], i) => {
+    const x = 40 + i * 180 * (1 - merge)
+    const y = 40 + i * 90 * (1 - merge)
+    g.globalAlpha = 1 - merge
+    box(g, x, y, 700, 440, '#f1f3f4', 10)
+    box(g, x, y, 700, 46, '#dee1e6', 10)
+    box(g, x + 20, y + 8, 180, 38, '#f1f3f4', 8)
+    text(g, title, x + 36, y + 34, 18, '#202124', 500)
+    box(g, x + 650, y + 10, 28, 28, color, 14)
+    text(g, letter, x + 657, y + 31, 17, '#fff', 700)
+  })
+  if (merge < 0.4) return void (g.globalAlpha = 1)
+  g.globalAlpha = (merge - 0.4) / 0.6
+  box(g, 0, 0, w, h, '#1b1b1d')
+  text(g, 'Zen', 30, 50, 22, '#e5e5e5', 700)
+  ;[['Gmail', 'Work', '#2563eb'], ['Gmail', 'Personal', '#ea580c'], ['Supabase', 'Eupersona', '#16a34a'], ['Drive', 'Harness', '#9333ea']].forEach(([tab, space, color], i) => {
+    box(g, 16, 84 + i * 62, 268, 50, i ? '#1b1b1d' : '#2a2a2d', 10)
+    box(g, 26, 98 + i * 62, 4, 22, color, 2)
+    text(g, tab, 42, 115 + i * 62, 19, '#e5e5e5', 500)
+    text(g, space, 150, 115 + i * 62, 17, color, 600)
+  })
+  ;['#2563eb', '#ea580c', '#16a34a', '#9333ea'].forEach((color, i) => box(g, 40 + i * 50, h - 50, 22, 22, color, 11))
+  box(g, 300, 16, w - 316, h - 32, '#f8f9fa', 14)
+  box(g, 330, 60, 300, 24, '#d0d4da', 6)
+  for (let j = 0; j < 6; j++) box(g, 330, 120 + j * 44, w - 420 - (j % 3) * 90, 18, '#e3e6ea', 6)
+  g.globalAlpha = 1
 }
 
 const codeChat: Item[] = [['user', 'Fix the login redirect'], ['tool', 'Read  app/login/page.tsx'], ['ai', 'Fixed. 2 files changed.']]

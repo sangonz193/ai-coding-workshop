@@ -28,7 +28,7 @@ The story and visual direction are still being developed.
 
 ## Workshop prototype
 
-A miniature workshop rendered with three.js: the camera moves between desks whose laptops, monitors and phones show each part of the story on interfaces recreated from each app’s real design (generated code piling up as pull requests, the Paseo workspace and a forked conversation, worktrees compiling their env files from committed templates, a branch graph being cleaned up, a review loop jamming work until it became one review, one fix and one confirmation, and the Eupersona review screen being removed), then pulls back to the whole workshop.
+A miniature workshop rendered with three.js: the camera moves between desks whose laptops, monitors and phones show each part of the story on interfaces recreated from each app’s real design (generated code piling up as pull requests, VS Code windows multiplying with every worktree until the code client and then Paseo replaced them, a forked conversation, worktrees compiling their env files from committed templates, a branch graph being cleaned up, a review loop jamming work until it became one review, one fix and one confirmation, and the Eupersona review screen being removed), then pulls back to the whole workshop.
 
 ```sh
 pnpm install

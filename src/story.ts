@@ -11,19 +11,23 @@ export const scenes: Scene[] = [
   },
   {
     chapter: 'Workspace',
-    title: 'The workspace I almost built',
+    title: 'From one editor to many agents',
     steps: [
-      ['I’d built my own: one command, any browser.', 'code, my remote development client. npx remote-coding started a daemon on the dev box that ran Claude or Codex on my existing login, and served a web client to any browser: chat, files, terminals, diffs.'],
-      ['Then I found Paseo.', 'Surreal and bittersweet: a far more polished future of my own project. I stopped building code.'],
-      ['One conversation, two providers.', 'I came for provider flexibility: GPT through my Codex subscription, then fork the same conversation into Claude on my Anthropic subscription, not API billing. Both continue from the shared history.'],
+      ['I used to write code in VS Code.', 'The starting point: my editor, my keyboard, my code.'],
+      ['Then AI moved into the sidebar.', 'Copilot, then the Claude and Codex extensions. Better, but still one chat and one task at a time while I waited.'],
+      ['Worktrees meant a window per copy.', 'Worktrees were the answer to one task at a time. In VS Code they meant ten or more windows: heavy on my machine, and hard to find the right project and worktree.'],
+      ['So I built my own: one command, any browser.', 'code, my remote development client, ran sessions in worktrees within its first days. npx remote-coding started a daemon that ran Claude or Codex on my existing login, and served a web client to any browser: chat, files, terminals, diffs.'],
+      ['Then I found Paseo. One window.', 'Surreal and bittersweet: a far more polished future of my own project, so I stopped building code. Every project and worktree in one window. VS Code now opens less than once a week.'],
+      ['One conversation, two providers.', 'I came for provider flexibility: GPT through my Codex subscription, then fork the same conversation into Claude on my Anthropic subscription, not API billing.'],
       ['Same conversation, every screen.', 'Desktop app, installed iOS and Android apps, and a browser served by the desktop.'],
+      ['One window changed my browser too.', 'Chromium profiles meant a window per profile. Zen keeps separate logins as workspaces with their own containers, side by side in one window.'],
     ],
   },
   {
     chapter: 'Setup',
     title: 'Many copies, same setup',
     steps: [
-      ['Parallel copies of one project.', 'Paseo unlocked worktrees for me: several working copies of the same project at once.'],
+      ['Parallel copies of one project.', 'Paseo made worktrees practical: several working copies of the same project at once.'],
       ['Every copy needs its environment again.', '.env files are not committed, so each new worktree starts without them: copy and edit one per app, by hand. Repeated setup becomes repeated friction, for people and for AI.'],
       ['Declared once. One command per copy.', 'Envwire: every variable is declared once in a committed root .env.template, each app’s template picks what it needs under its own names, and envwire compiles the real .env files. A fresh worktree runs one command, or the dev script runs it, for people and agents alike.'],
     ],
