@@ -5,7 +5,7 @@ import * as S from './screens'
 import { scenes } from './story'
 
 type V3 = [number, number, number]
-type Opts = { to?: number; lift?: number; shift?: [number, V3]; turn?: [number, number]; tick?: (o: THREE.Object3D, t: number) => void }
+type Opts = { to?: number; lift?: number; shift?: [number, V3]; turn?: [number, number]; wait?: number; tick?: (o: THREE.Object3D, t: number) => void }
 type Prop = Required<Pick<Opts, 'to' | 'lift'>> & Opts & { obj: THREE.Object3D; from: number; home: THREE.Vector3; tilt: number }
 type Screen = { g: CanvasRenderingContext2D; map: THREE.CanvasTexture; scene: number; paint: S.Paint; live: boolean; seconds: number; k: number; active: boolean; since: number; p: number }
 
@@ -14,7 +14,7 @@ const spots = [[-11, -5], [0, -7], [11, -5], [11, 7], [0, 9], [-11, 7], [0, 1.5]
 const stationOf = [0, 1, 2, 4, 5, 6]
 const shots: Record<string, number[]> = {
   0: [0, 1, -0.8, 2],
-  1: [-2.55, 0.62, -0.2, 3.7], '1.6': [-1.7, 1.3, 0.5, 2], '1.7': [-1.4, 1.6, 0, 1.4], '1.8': [2.3, 0.8, 0.2, 2.4],
+  1: [-2.55, 0.62, -0.2, 3.7], '1.6': [-1.7, 1.3, 0.5, 2], '1.7': [-1.4, 1.6, 0, 1.4], '1.8': [0.4, 1, 0.1, 1.55],
   '1.9': [-0.5, 1.3, -0.4, 1.3], '1.10': [-0.3, 1.9, -0.8, 2.6],
   2: [0.3, 0.8, -0.5, 1.35], '2.1': [-1.4, 0.9, -0.2, 1.9], '2.2': [0, 2.3, -0.6, 2, 3], '2.3': [0, 2.3, -0.6, 2, 3],
   3: [-0.2, 1, -0.1, 1.3], '3.2': [1.7, 1.9, -0.9, 2.3], '3.3': [0.6, 1, 0.1, 1.3],
@@ -145,7 +145,7 @@ export function createWorkshop(host: HTMLElement) {
     const pane = group(desk, pos, first ? 0 : ((i % 3) - 1) * 0.15)
     box(pane, [pw, ph, 0.02], M.black, [0, -ph / 2, 0])
     mount(pane, display(1, S.vscodeWindow(i), pw * 0.97, ph * 0.95, 768), [0, 0, 0.012])
-    prop(pane, at(1, i < 3 ? 6 : 7), { to: at(1, 9), lift: -0.3, shift: [at(1, 9), [-0.3 - pos[0], 1.9 - pos[1], -0.8 - pos[2]]] })
+    prop(pane, at(1, i < 3 ? 6 : 7), { to: at(1, 8), lift: -0.3, wait: 1.2 + i * 0.08, shift: [at(1, 8), [2.25 - pos[0], 0.75 - pos[1], 0.1 - pos[2]]] })
   }
   const own = laptop(desk, [2.2, 0.12, 0.6], 1, S.remoteCoding, 1.8, -0.4)
   prop(own.g, at(1, 8), { lift: 0.8 })
@@ -207,6 +207,8 @@ export function createWorkshop(host: HTMLElement) {
   const goal = new THREE.Vector3()
   let pos = stops[0]
   let current = 0
+  let previous = 0
+  let changedAt = 0
   let goalZoom = 1
   let drag = 0
   let dragX: number | null = null
@@ -233,14 +235,15 @@ export function createWorkshop(host: HTMLElement) {
     const k = reduced.matches ? 1 : 1 - Math.exp(-Math.min(ms - last, 100) / 220)
     last = ms
     for (const p of props) {
-      const on = current >= p.from && current < p.to
+      const now = p.wait && t - changedAt < p.wait ? previous : current
+      const on = now >= p.from && now < p.to
       const target = p.home.clone()
       if (!on) target.y += p.lift
-      if (p.shift && current >= p.shift[0]) target.add(new THREE.Vector3(...p.shift[1]))
+      if (p.shift && now >= p.shift[0]) target.add(new THREE.Vector3(...p.shift[1]))
       p.obj.position.lerp(target, k)
       p.obj.scale.setScalar(THREE.MathUtils.lerp(p.obj.scale.x, on ? 1 : 0.001, k))
       p.obj.visible = p.obj.scale.x > 0.01
-      if (p.turn) p.obj.rotation.x = THREE.MathUtils.lerp(p.obj.rotation.x, current >= p.turn[0] ? p.turn[1] : p.tilt, k)
+      if (p.turn) p.obj.rotation.x = THREE.MathUtils.lerp(p.obj.rotation.x, now >= p.turn[0] ? p.turn[1] : p.tilt, k)
       if (p.tick && !reduced.matches) p.tick(p.obj, t)
     }
     for (const s of screens) {
@@ -268,7 +271,9 @@ export function createWorkshop(host: HTMLElement) {
   return {
     show(p: Position) {
       pos = p
+      previous = current
       current = indexOf(p)
+      changedAt = performance.now() / 1000
       const [dx, y, dz, zoom, spot = stationOf[p.scene]] = shots[`${p.scene}.${p.step}`] ?? shots[p.scene]
       goal.set(spots[spot][0] + dx, y, spots[spot][1] + dz)
       goalZoom = zoom

@@ -199,6 +199,28 @@ const statusBar = (g: G, w: number, s: number) => {
   box(g, w - s * 2.4, s * 1.05, s * 1.3, s * 0.6, '#fff', s * 0.15)
 }
 
+const codeTree: [kind: 'project' | 'worktree', name: string, count: string, dirty?: boolean][] = [
+  ['project', 'EUPERSONA', '5'], ['worktree', 'main', ''], ['worktree', 'dark-mode', '1', true], ['worktree', 'login-redirect', '1'],
+  ['worktree', 'search', '1', true], ['worktree', 'card-photos', '2'], ['project', 'ENVWIRE', '1'], ['worktree', 'main', '1'],
+  ['project', 'GIT-NAV', '1'], ['worktree', 'main', '1'],
+]
+
+function codeSidebar(g: G, x: number, y: number, w: number, size: number) {
+  codeTree.forEach(([kind, name, count, dirty], i) => {
+    const ry = y + i * size * 2
+    if (kind === 'project') text(g, `▸ ${name}`, x, ry, size * 0.8, '#a3a3a3', 700)
+    else {
+      if (name === 'login-redirect') box(g, x + size * 0.4, ry - size * 1.25, w - size * 0.4, size * 1.8, '#262626', 6)
+      const end = text(g, `⎇ ${name}`, x + size, ry, size, '#fafafa', 400)
+      if (dirty) box(g, end + size * 0.4, ry - size * 0.55, size * 0.4, size * 0.4, '#f59e0b', size)
+    }
+    if (count) {
+      g.font = `400 ${size * 0.85}px ${sans}`
+      text(g, count, x + w - g.measureText(count).width - size * 0.5, ry, size * 0.85, '#737373', 400)
+    }
+  })
+}
+
 export const codePhone: Paint = (g) => {
   const { width: w, height: h } = g.canvas
   const s = w / 16
@@ -206,12 +228,10 @@ export const codePhone: Paint = (g) => {
   box(g, 0, 0, w, s * 2.6, '#202124')
   box(g, s * 0.6, s * 0.5, w - s * 1.2, s * 1.6, '#303134', s)
   text(g, '192.168.1.20:8787', s * 1.4, s * 1.6, s * 0.75, '#bdc1c6', 400)
-  const size = Math.min(s * 0.7, 22)
-  box(g, s, s * 3, s * 1.4, s * 1.4, '#2563eb', s * 0.3)
-  text(g, 'Fix login redirect', s * 3, s * 4, size * 1.1, '#fafafa', 600)
-  transcript(g, codeChat, s, s * 6, w - 2 * s, size)
-  box(g, s * 0.6, h - s * 3.4, w - s * 1.2, s * 2.6, '#171717', s * 0.5)
-  text(g, 'Message', s * 1.2, h - s * 2.2, size, '#737373', 400)
+  box(g, s, s * 3.4, s * 1.4, s * 1.4, '#2563eb', s * 0.3)
+  text(g, 'Remote Agent', s * 3, s * 4.4, s * 0.9, '#fafafa', 600)
+  text(g, 'Projects', s, s * 7, s * 0.75, '#d4d4d4', 500)
+  codeSidebar(g, s, s * 9, w - 2 * s, s * 0.8)
 }
 
 const vsFiles = ['EUPERSONA', '  settings', '    theme.tsx', '    settings.tsx', '  auth', '    login.tsx', '    session.ts']
@@ -330,14 +350,13 @@ export const remoteCoding: Paint = (g) => {
   text(g, '1 server', x + 68, 62, 14, '#a3a3a3', 400)
   text(g, '+  New Chat', x + 28, 108, 16, '#a3a3a3', 400)
   text(g, 'Projects', x + 28, 150, 15, '#d4d4d4', 500)
-  text(g, 'eupersona', x + 28, 182, 15, '#fafafa', 400)
-  box(g, x + 22, 194, 190, 30, '#262626', 6)
-  text(g, 'Fix login redirect', x + 34, 214, 14, '#fafafa', 400)
+  codeSidebar(g, x + 26, 186, 184, 14)
   box(g, w - 120, 22, 100, 28, '#171717', 14)
   box(g, w - 108, 32, 9, 9, ps.green, 5)
   text(g, 'Online', w - 92, 42, 14, '#fafafa', 500)
   text(g, 'Fix login redirect', x + 240, 90, 20, '#fafafa', 600)
-  transcript(g, codeChat, x + 240, 130, w - x - 260, 17)
+  text(g, 'eupersona · login-redirect', x + 240, 114, 14, '#a3a3a3', 400)
+  transcript(g, codeChat, x + 240, 140, w - x - 260, 17)
   box(g, x + 236, h - 110, w - x - 252, 90, '#171717', 12)
   text(g, 'Message', x + 252, h - 76, 16, '#737373', 400)
 }
