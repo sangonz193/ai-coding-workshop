@@ -7,7 +7,7 @@ import { scenes } from './story'
 type V3 = [number, number, number]
 type Opts = { to?: number; lift?: number; shift?: [number, V3]; turn?: [number, number]; tick?: (o: THREE.Object3D, t: number) => void }
 type Prop = Required<Pick<Opts, 'to' | 'lift'>> & Opts & { obj: THREE.Object3D; from: number; home: THREE.Vector3; tilt: number }
-type Screen = { g: CanvasRenderingContext2D; map: THREE.CanvasTexture; scene: number; paint: S.Paint; live: boolean; k: number; since: number; p: number }
+type Screen = { g: CanvasRenderingContext2D; map: THREE.CanvasTexture; scene: number; paint: S.Paint; live: boolean; seconds: number; k: number; since: number; p: number }
 
 const at = (scene: number, step = 0) => indexOf({ scene, step })
 const spots = [[-11, -5], [0, -7], [11, -5], [11, 7], [0, 9], [-11, 7], [0, 1.5]]
@@ -64,12 +64,12 @@ export function createWorkshop(host: HTMLElement) {
     return mesh
   }
   const screens: Screen[] = []
-  const display = (scene: number, paint: S.Paint, w: number, h: number, res: number, live = false) => {
+  const display = (scene: number, paint: S.Paint, w: number, h: number, res: number, live = false, seconds = 1.2) => {
     const canvas = Object.assign(document.createElement('canvas'), { width: res, height: Math.round((res * h) / w) })
     const map = new THREE.CanvasTexture(canvas)
     map.colorSpace = THREE.SRGBColorSpace
     map.anisotropy = 8
-    screens.push({ g: canvas.getContext('2d')!, map, scene, paint, live, k: -1, since: 0, p: -1 })
+    screens.push({ g: canvas.getContext('2d')!, map, scene, paint, live, seconds, k: -1, since: 0, p: -1 })
     return new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map, toneMapped: false }))
   }
   const group = (parent: THREE.Object3D, [x, y, z]: V3, ry = 0, rx = 0) => {
@@ -93,13 +93,13 @@ export function createWorkshop(host: HTMLElement) {
     mount(lid, display(scene, paint, w * 0.92, w * 0.56, 1024, live), [0, w * 0.32, 0.022])
     return { g, lid }
   }
-  const monitor = (parent: THREE.Object3D, pos: V3, scene: number, paint: S.Paint, w: number) => {
+  const monitor = (parent: THREE.Object3D, pos: V3, scene: number, paint: S.Paint, w: number, seconds?: number) => {
     const g = group(parent, pos)
     box(g, [w * 0.3, 0.04, w * 0.18], M.metal, [0, 0, 0])
     box(g, [0.14, w * 0.3, 0.06], M.metal, [0, 0.04, -0.06])
     const panel = group(g, [0, w * 0.3, 0], 0, -0.08)
     box(panel, [w, w * 0.6, 0.06], M.black, [0, 0, 0])
-    mount(panel, display(scene, paint, w * 0.97, w * 0.57, 1280), [0, w * 0.3, 0.031])
+    mount(panel, display(scene, paint, w * 0.97, w * 0.57, 1280, false, seconds), [0, w * 0.3, 0.031])
     return g
   }
   const phone = (parent: THREE.Object3D, pos: V3, scene: number, paint: S.Paint, size: number, wide = false) => {
@@ -141,7 +141,7 @@ export function createWorkshop(host: HTMLElement) {
   const desk = station(1)
   prop(laptop(desk, [2.2, 0.12, 0.6], 1, S.remoteCoding, 1.8, -0.4).lid, 0, { turn: [at(1, 1), Math.PI / 2] })
   prop(phone(desk, [0.7, 0.12, 1], 1, S.remote('code'), 1.1), at(1), { to: at(1, 1), lift: -0.5 })
-  prop(monitor(desk, [-0.3, 0.12, -0.8], 1, S.paseo, 3), at(1, 1), { lift: -1.2 })
+  prop(monitor(desk, [-0.3, 0.12, -0.8], 1, S.paseo, 3, 3.5), at(1, 1), { lift: -1.2 })
   prop(phone(desk, [-0.7, 0.12, 1.1], 1, S.remote('browser'), 1.1, true), at(1, 3), { lift: -0.5 })
   ;(['ios', 'android'] as const).forEach((kind, i) => prop(phone(desk, [0.4 + i * 0.65, 0.12, 1.1], 1, S.remote(kind), 1), at(1, 3), { lift: -0.5 }))
 
@@ -154,7 +154,7 @@ export function createWorkshop(host: HTMLElement) {
     prop(laptop(copies, [x, 0.12, -0.3], 2, S.worktree(i), 2, 0.1 * (1 - i)).g, at(2), { lift: 0.8 + i * 0.3 }),
   )
 
-  monitor(station(3), [0, 0.12, -0.6], 3, S.gitNav, 3.8)
+  monitor(station(3), [0, 0.12, -0.6], 3, S.gitNav, 3.8, 4)
 
   const jam = station(4, 8)
   monitor(jam, [1.7, 0.12, -0.9], 4, S.reviewLoop, 2.8)
@@ -238,7 +238,7 @@ export function createWorkshop(host: HTMLElement) {
     for (const s of screens) {
       const step = s.scene < pos.scene ? scenes[s.scene].steps.length - 1 : s.scene > pos.scene ? 0 : pos.step
       if (step !== s.k) Object.assign(s, { k: step, since: t })
-      const p = reduced.matches ? 1 : Math.min(1, (t - s.since) / 1.2)
+      const p = reduced.matches ? 1 : Math.min(1, (t - s.since) / s.seconds)
       if (p === s.p && !(s.live && !reduced.matches)) continue
       s.p = p
       s.paint(s.g, step, p * p * (3 - 2 * p), reduced.matches ? 3 : t)
