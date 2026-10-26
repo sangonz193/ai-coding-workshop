@@ -1,24 +1,45 @@
 import './style.css'
 import { $, deck } from './deck'
-import { indexOf, move, stops, type Position } from './state'
+import { indexOf, move, stops, welcome, type Position } from './state'
 import { answers, scenes } from './story'
-import { join, latest, onLive, publish, supabase } from './sync'
+import { join, latest, latestQr, onLive, publish, supabase } from './sync'
 import { createWorkshop } from './workshop'
 
 const stage = createWorkshop($('stage'))
+let here = latest()
+let qr = latestQr()
 const render = deck((p) => {
-  publish(p)
+  publish(p, qr)
   show(p)
 })
 
+function toggleQr() {
+  qr = !qr
+  publish(here, qr)
+  show(here)
+}
+
 function show(p: Position) {
+  here = p
   render(p)
   stage?.show(p)
   const next = move(p, 1)
-  $('notes').textContent = scenes[p.scene].steps[p.step][1]
+  $('qr').textContent = qr ? 'Hide join code' : 'Show join code'
+  $('qr').setAttribute('aria-pressed', String(qr))
   $('upcoming').textContent = next === p ? 'End of the talk.' : scenes[next.scene].steps[next.step][0]
-  $('counter').textContent = `Step ${p.step + 1} of ${scenes[p.scene].steps.length} · ${indexOf(p) + 1} of ${stops.length} overall`
+  if (p === welcome) {
+    $('notes').textContent = 'Waiting screen. Leave it up while people scan the code and the room fills.'
+    $('counter').textContent = `Join screen · ${stops.length - 1} steps to go`
+    return
+  }
+  $('notes').textContent = scenes[p.scene].steps[p.step][1]
+  $('counter').textContent = `Step ${p.step + 1} of ${scenes[p.scene].steps.length} · ${indexOf(p)} of ${stops.length - 1} overall`
 }
+
+$('qr').onclick = toggleQr
+addEventListener('keydown', (e) => {
+  if (e.key.toLowerCase() === 'q' && !e.metaKey && !e.ctrlKey && !(e.target instanceof HTMLInputElement)) toggleQr()
+})
 
 $('answers').append(
   ...answers.map(([question, answer]) => {
@@ -27,8 +48,11 @@ $('answers').append(
     return item
   }),
 )
-onLive(show)
-show(latest())
+onLive((p, live) => {
+  qr = live
+  show(p)
+})
+show(here)
 
 const signin = $('signin') as HTMLFormElement
 const { data } = await supabase.auth.getSession()

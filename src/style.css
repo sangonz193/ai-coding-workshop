@@ -44,6 +44,20 @@ form[hidden] { display: none; }
 input { min-height: 44px; padding: 0.5rem 1rem; border: 0; border-radius: 999px; font: inherit; }
 button:hover, select:hover { background: #fff; }
 :focus-visible { outline: 3px solid var(--brass); outline-offset: 2px; }
+.join { display: none; position: fixed; inset: 0; place-content: center; justify-items: center; gap: 1rem; background: #221a15e6; text-align: center; }
+.joining .join { display: grid; }
+.joining .caption { display: none; }
+.join-title { margin: 0; font: 600 clamp(1.6rem, 4vw, 3rem) / 1.1 'Iowan Old Style', Palatino, Georgia, serif; }
+.join-hint { margin: 0 0 0.5rem; font-size: 1.15rem; opacity: 0.85; }
+.join-code { width: min(50vh, 60vw); aspect-ratio: 1; padding: 1rem; background: var(--paper); border-radius: 12px; }
+.join-code svg { display: block; width: 100%; height: 100%; }
+.join-url { margin: 0; font: 600 clamp(1.4rem, 3vw, 2.4rem) 'Iowan Old Style', Palatino, Georgia, serif; }
+.joined { display: none; max-width: 22rem; font-size: 1.15rem; line-height: 1.45; }
+@media (min-width: 900px) { .qr .join { display: grid; } }
+@media (max-width: 899px) {
+  .join-code, .join-url, .join-hint { display: none; }
+  .joined { display: block; }
+}
 .presenter .layout { display: grid; grid-template-columns: minmax(0, 3fr) minmax(22rem, 2fr); height: 100dvh; overflow: hidden; }
 .presenter .stage { position: relative; min-height: 0; }
 .desk { min-height: 0; padding: 2rem; background: #2d241e; overflow: auto; }

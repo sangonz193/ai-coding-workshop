@@ -274,10 +274,11 @@ export function createWorkshop(host: HTMLElement) {
       previous = current
       current = indexOf(p)
       changedAt = performance.now() / 1000
-      const [dx, y, dz, zoom, spot = stationOf[p.scene]] = shots[`${p.scene}.${p.step}`] ?? shots[p.scene]
+      const scene = p.scene < 0 ? scenes.length - 1 : p.scene
+      const [dx, y, dz, zoom, spot = stationOf[scene]] = shots[`${scene}.${p.step}`] ?? shots[scene]
       goal.set(spots[spot][0] + dx, y, spots[spot][1] + dz)
       goalZoom = zoom
-      Object.assign(goalView, p.scene === scenes.length - 1 ? { turn: Math.PI / 4, pitch: 0.75 } : { turn: 0, pitch: 0.42 })
+      Object.assign(goalView, scene === scenes.length - 1 ? { turn: Math.PI / 4, pitch: 0.75 } : { turn: 0, pitch: 0.42 })
     },
   }
 }

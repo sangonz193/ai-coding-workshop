@@ -1,4 +1,4 @@
-import { find, move, stops, type Position } from './state'
+import { find, move, stops, welcome, type Position } from './state'
 import { scenes } from './story'
 
 export const $ = (id: string) => document.getElementById(id)!
@@ -8,7 +8,7 @@ const keys: Record<string, number> = { ArrowRight: 1, ArrowDown: 1, PageDown: 1,
 export function deck(go: (p: Position) => void) {
   let here = stops[0]
   const chapters = $('chapters') as HTMLSelectElement
-  chapters.append(...scenes.map((s, i) => new Option(`${i + 1}. ${s.chapter}`, String(i))))
+  chapters.append(new Option('Join', '-1'), ...scenes.map((s, i) => new Option(`${i + 1}. ${s.chapter}`, String(i))))
   chapters.onchange = () => go(find({ scene: +chapters.value, step: 0 })!)
   $('prev').onclick = () => go(move(here, -1))
   $('next').onclick = () => go(move(here, 1))
@@ -21,10 +21,16 @@ export function deck(go: (p: Position) => void) {
   })
   return (p: Position) => {
     here = p
+    chapters.value = String(p.scene)
+    if (p === welcome) {
+      $('chapter').textContent = 'Starting soon'
+      $('title').textContent = 'Code is solved, engineering is not.'
+      $('text').textContent = 'Follow along on your phone.'
+      return
+    }
     const s = scenes[p.scene]
     $('chapter').textContent = `${p.scene + 1} of ${scenes.length} · ${s.chapter}`
     $('title').textContent = s.title
     $('text').textContent = s.steps[p.step][0]
-    chapters.value = String(p.scene)
   }
 }
