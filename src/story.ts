@@ -17,29 +17,18 @@ export const scenes: Scene[] = [
       ['Then AI moved into the sidebar.', 'Copilot, then the Claude and Codex extensions. Better, but still one chat and one task at a time while I waited.'],
       ['Worktrees meant a window per copy.', 'Worktrees were the answer to one task at a time. In VS Code they meant ten or more windows: heavy on my machine, and hard to find the right project and worktree.'],
       ['So I built my own: one command, any browser.', 'code, my remote development client, ran sessions in worktrees within its first days. npx remote-coding started a daemon that ran Claude or Codex on my existing login, and served a web client to any browser: chat, files, terminals, diffs.'],
-      ['Then I found Paseo. One window.', 'Surreal and bittersweet: a far more polished future of my own project, so I stopped building code. Every project and worktree in one window. VS Code now opens less than once a week.'],
-      ['One conversation, two providers.', 'I came for provider flexibility: GPT through my Codex subscription, then fork the same conversation into Claude on my Anthropic subscription, not API billing.'],
-      ['Same conversation, every screen.', 'Desktop app, installed iOS and Android apps, and a browser served by the desktop.'],
-      ['One window changed my browser too.', 'Chromium profiles meant a window per profile. Zen keeps separate logins as workspaces with their own containers, side by side in one window.'],
+      ['Then I found Paseo. One window.', 'Surreal and bittersweet: a far more polished future of my own project, so I stopped building code. Every project and worktree in one window; VS Code now opens less than once a week. It also runs as installed iOS and Android apps and in a browser served by the desktop. The same idea changed my browser: Chromium profiles meant a window each, while Zen keeps separate logins as workspaces with their own containers in one window.'],
+      ['Any provider, my own folders.', 'GPT through my Codex subscription, then fork the same chat into Claude on my Anthropic subscription, not API billing. Why not the Codex or Claude apps, or their cloud agents? One interface for every provider, and agents working in my local folders instead of on remote servers, including a gitignored docs.local/ folder of meeting notes and emails they can read.'],
     ],
   },
   {
-    chapter: 'Setup',
-    title: 'Many copies, same setup',
+    chapter: 'Upkeep',
+    title: 'Parallel work multiplies upkeep',
     steps: [
-      ['Parallel copies of one project.', 'Paseo made worktrees practical: several working copies of the same project at once.'],
-      ['Every copy needs its environment again.', '.env files are not committed, so each new worktree starts without them: copy and edit one per app, by hand. Repeated setup becomes repeated friction, for people and for AI.'],
+      ['Every copy needs its environment again.', 'Paseo made worktrees practical, and every worktree starts without .env files because they are not committed: copy and edit one per app, by hand. Repeated setup becomes repeated friction, for people and for AI.'],
       ['Declared once. One command per copy.', 'Envwire: every variable is declared once in a committed root .env.template, each app’s template picks what it needs under its own names, and envwire compiles the real .env files. A fresh worktree runs one command, or the dev script runs it, for people and agents alike.'],
-    ],
-  },
-  {
-    chapter: 'Branches',
-    title: 'Keeping branches in order',
-    steps: [
-      ['Branches pile up.', 'I used to read them in VS Code’s Git Graph.'],
-      ['Git Nav, in the browser.', 'It replaced Git Graph for me, and the desktop serves it to the browser, like Paseo.'],
-      ['Two clicks: merged branches gone.', 'Squash-merged branches look unmerged to Git. Cleaning them up used to be a chore.'],
-      ['Two clicks: branches brought forward.', 'Eligible branches move forward. Orchestrator worktrees often stay aligned with the default branch.'],
+      ['Branches pile up.', 'Every parallel copy leaves branches behind. I used to read them in VS Code’s Git Graph; Git Nav replaced it, and the desktop serves it to the browser, like Paseo.'],
+      ['Two clicks each: clean up, bring forward.', 'Squash-merged branches look unmerged to Git; Git Nav matches them by content. Eligible branches fast-forward to the default branch. Orchestrator worktrees often stay aligned with the default branch.'],
     ],
   },
   {
@@ -68,7 +57,20 @@ export const scenes: Scene[] = [
     title: 'Code is solved. Engineering is not.',
     steps: [
       ['Step back.', 'Let the camera finish pulling back before speaking.'],
-      ['Engineering is the whole system, and judging what ships.', 'Close, thank the room, take questions.'],
+      ['Deciding what should exist, what done means, and when to stop.', 'That is what still needed me: removing the screen instead of patching around it, counting dead code as unfinished work, and cutting the review loop down to one pass. Close, thank the room, take questions.'],
     ],
   },
+]
+
+export const answers: [question: string, answer: string][] = [
+  ['Why not the Codex or Claude Code apps?', 'I wanted one interface for every provider, where a conversation can move between them, instead of one app per vendor.'],
+  ['Why not their cloud agents?', 'I prefer agents working in my local folders: my machine, my local services, and a gitignored docs.local/ folder of meeting notes and emails that never goes to git.'],
+  ['What does it cost?', 'Subscriptions, not API billing: GPT through my Codex plan and Claude through my Anthropic plan. Paseo itself is open source.'],
+  ['Do you hit usage limits?', 'Yes. Long review loops were a big part of it, and my orchestration instructions account for which provider has usage left.'],
+  ['Is it safe to let agents run with full permissions?', 'They work in separate worktrees. Before any push, a hook makes the agent confirm the push was requested, checks pass, and the review approved it.'],
+  ['Why build Git Nav and Envwire instead of using existing tools?', 'Git Nav: squash-merged cleanup matched by content, bulk fast-forward, and browser access from the desktop. Envwire: every variable declared once, each app picks what it needs under its own names, plus a CI check for variables an app reads but never wires in.'],
+  ['What is an orchestrator agent?', 'An agent that plans the work and delegates it to other agents in their own worktrees, then checks the results. Its own worktree usually stays on the default branch.'],
+  ['How do you review this much code?', 'One review with two reviewers, one fix pass, one confirmation; leftovers become an issue. I still change 26 to 30% of approved work, which is why the final call stays with me.'],
+  ['Did it make you faster?', 'The only thing I measured is the review loop. The rest is my experience, not data.'],
+  ['Do you still write code?', 'Rarely. VS Code opens less than once a week, mostly to read a file.'],
 ]

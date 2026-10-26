@@ -144,8 +144,19 @@ export const paseo: Paint = (g, k, p) => {
   const tabs: [string, string, boolean][] = [['◎', 'Add dark mode', !forked]]
   if (forked) tabs.push(['✳', 'Add dark mode', true])
   const area = paseoFrame(g, 'dark-mode-settings', tabs, forked ? 'Opus 5.5  ·  high' : 'GPT-6.1-Sol  ·  medium')
-  const y = transcript(g, trunk, area.x, area.y, area.w, 22)
-  if (forked) transcript(g, [['user', 'Review what changed'], ['ai', 'Two buttons fail contrast in dark mode.']], area.x, y + 10, area.w, 22)
+  const width = forked ? area.w - 300 : area.w
+  const y = transcript(g, trunk, area.x, area.y, width, 22)
+  if (forked) {
+    const after: Item[] = [['user', 'Check it against the client call notes'], ['tool', 'Read  docs.local/client-call-oct-14.md'], ['ai', 'The client asked for high contrast; two buttons fail it.']]
+    transcript(g, after, area.x, y + 10, width, 22)
+    const fx = g.canvas.width - 300
+    box(g, fx, 121, 300, g.canvas.height - 121, ps.side)
+    text(g, 'Files', fx + 24, 160, 20, ps.text, 600)
+    ;[['apps/', ps.text], ['docs.local/', ps.muted], ['  client-call-oct-14.md', '#e5b45b'], ['  client-emails.md', ps.muted], ['  meeting-notes.md', ps.muted], ['package.json', ps.text]].forEach(([f, color], i) =>
+      text(g, f, fx + 24, 206 + i * 38, 18, color, 400, mono),
+    )
+    text(g, 'gitignored', fx + 180, 244, 15, ps.muted, 400)
+  }
   if (k !== 5 || forked) return
   box(g, area.x + 60, y + 4, 330, 120, '#1b1b1b', 12)
   g.strokeStyle = ps.line
@@ -156,40 +167,25 @@ export const paseo: Paint = (g, k, p) => {
   text(g, 'Fork in a new workspace', area.x + 90, y + 116, 20, ps.muted, 400)
 }
 
-const statusBar = (g: G, w: number, s: number, kind: 'ios' | 'android') => {
+const statusBar = (g: G, w: number, s: number) => {
   text(g, '10:23', s * 1.2, s * 1.7, s * 0.8, '#fff', 600)
-  if (kind === 'ios') box(g, w / 2 - s * 2.6, s * 0.6, s * 5.2, s * 1.5, '#000', s)
-  else box(g, w / 2 - s * 0.5, s * 0.8, s, s, '#000', s)
+  box(g, w / 2 - s * 2.6, s * 0.6, s * 5.2, s * 1.5, '#000', s)
   box(g, w - s * 2.4, s * 1.05, s * 1.3, s * 0.6, '#fff', s * 0.15)
 }
 
-export const remote = (kind: 'ios' | 'android' | 'browser' | 'code'): Paint => (g) => {
+export const codePhone: Paint = (g) => {
   const { width: w, height: h } = g.canvas
   const s = w / 16
-  box(g, 0, 0, w, h, kind === 'code' ? '#0a0a0a' : ps.bg)
-  let top = s * 3
-  if (kind === 'ios' || kind === 'android') statusBar(g, w, s, kind)
-  else {
-    box(g, 0, 0, w, s * 2.6, '#202124')
-    box(g, s * 0.6, s * 0.5, w - s * 1.2, s * 1.6, '#303134', s)
-    text(g, kind === 'code' ? '192.168.1.20:8787' : 'MacBook-Pro.local', s * 1.4, s * 1.6, s * 0.75, '#bdc1c6', 400)
-  }
+  box(g, 0, 0, w, h, '#0a0a0a')
+  box(g, 0, 0, w, s * 2.6, '#202124')
+  box(g, s * 0.6, s * 0.5, w - s * 1.2, s * 1.6, '#303134', s)
+  text(g, '192.168.1.20:8787', s * 1.4, s * 1.6, s * 0.75, '#bdc1c6', 400)
   const size = Math.min(s * 0.7, 22)
-  if (kind === 'code') {
-    box(g, s, top, s * 1.4, s * 1.4, '#2563eb', s * 0.3)
-    text(g, 'Fix login redirect', s * 3, top + s, size * 1.1, '#fafafa', 600)
-    transcript(g, codeChat, s, top + s * 3, w - 2 * s, size)
-    box(g, s * 0.6, h - s * 3.4, w - s * 1.2, s * 2.6, '#171717', s * 0.5)
-    text(g, 'Message', s * 1.2, h - s * 2.2, size, '#737373', 400)
-    return
-  }
-  text(g, '☰', s, top + s, size * 1.2, ps.text, 400)
-  text(g, 'dark-mode-settings', s * 2.6, top + s, size, ps.text, 500)
-  text(g, '◎  Add dark mode', s, top + s * 2.8, size * 0.9, ps.text, 400)
-  transcript(g, trunk, s, top + s * 4.4, w - 2 * s, size * 0.9)
-  box(g, s * 0.6, h - s * 3.6, w - s * 1.2, s * 2.8, '#141414', s * 0.6)
-  text(g, 'Message, @files, /commands', s * 1.2, h - s * 2.5, size * 0.85, ps.muted, 400)
-  text(g, 'GPT-6.1-Sol', s * 1.2, h - s * 1.4, size * 0.85, ps.text, 500)
+  box(g, s, s * 3, s * 1.4, s * 1.4, '#2563eb', s * 0.3)
+  text(g, 'Fix login redirect', s * 3, s * 4, size * 1.1, '#fafafa', 600)
+  transcript(g, codeChat, s, s * 6, w - 2 * s, size)
+  box(g, s * 0.6, h - s * 3.4, w - s * 1.2, s * 2.6, '#171717', s * 0.5)
+  text(g, 'Message', s * 1.2, h - s * 2.2, size, '#737373', 400)
 }
 
 const vsFiles = ['EUPERSONA', '  apps/web', '    settings', '      theme.tsx', '    intake', '  package.json']
@@ -228,38 +224,6 @@ export const vscodeWindow = (i: number): Paint => (g) => {
   for (let j = 0; j < 7; j++) box(g, 196, 66 + j * 30, 120 + ((i * 37 + j * 53) % 240), 12, j % 3 ? '#3a6ea5' : '#9cdcfe', 6)
 }
 
-export const zen: Paint = (g, k, p) => {
-  const { width: w, height: h } = g.canvas
-  box(g, 0, 0, w, h, '#151515')
-  const merge = k < 7 ? 0 : Math.min(1, p / 0.6)
-  ;[['W', '#2563eb', 'Gmail'], ['P', '#ea580c', 'Calendar'], ['E', '#16a34a', 'Supabase'], ['H', '#9333ea', 'Drive']].forEach(([letter, color, title], i) => {
-    const x = 40 + i * 180 * (1 - merge)
-    const y = 40 + i * 90 * (1 - merge)
-    g.globalAlpha = 1 - merge
-    box(g, x, y, 700, 440, '#f1f3f4', 10)
-    box(g, x, y, 700, 46, '#dee1e6', 10)
-    box(g, x + 20, y + 8, 180, 38, '#f1f3f4', 8)
-    text(g, title, x + 36, y + 34, 18, '#202124', 500)
-    box(g, x + 650, y + 10, 28, 28, color, 14)
-    text(g, letter, x + 657, y + 31, 17, '#fff', 700)
-  })
-  if (merge < 0.4) return void (g.globalAlpha = 1)
-  g.globalAlpha = (merge - 0.4) / 0.6
-  box(g, 0, 0, w, h, '#1b1b1d')
-  text(g, 'Zen', 30, 50, 22, '#e5e5e5', 700)
-  ;[['Gmail', 'Work', '#2563eb'], ['Gmail', 'Personal', '#ea580c'], ['Supabase', 'Eupersona', '#16a34a'], ['Drive', 'Harness', '#9333ea']].forEach(([tab, space, color], i) => {
-    box(g, 16, 84 + i * 62, 268, 50, i ? '#1b1b1d' : '#2a2a2d', 10)
-    box(g, 26, 98 + i * 62, 4, 22, color, 2)
-    text(g, tab, 42, 115 + i * 62, 19, '#e5e5e5', 500)
-    text(g, space, 150, 115 + i * 62, 17, color, 600)
-  })
-  ;['#2563eb', '#ea580c', '#16a34a', '#9333ea'].forEach((color, i) => box(g, 40 + i * 50, h - 50, 22, 22, color, 11))
-  box(g, 300, 16, w - 316, h - 32, '#f8f9fa', 14)
-  box(g, 330, 60, 300, 24, '#d0d4da', 6)
-  for (let j = 0; j < 6; j++) box(g, 330, 120 + j * 44, w - 420 - (j % 3) * 90, 18, '#e3e6ea', 6)
-  g.globalAlpha = 1
-}
-
 const codeChat: Item[] = [['user', 'Fix the login redirect'], ['tool', 'Read  app/login/page.tsx'], ['ai', 'Fixed. 2 files changed.']]
 
 export const remoteCoding: Paint = (g) => {
@@ -295,19 +259,18 @@ export const worktree = (i: number): Paint => (g, k, p) => {
   const { width: w, height: h } = g.canvas
   chrome(g, `app · ${branches[i]}`)
   box(g, 0, 56, 250, h - 56, c.panel)
-  const env = [c.line, c.red, c.green][k]
+  const env = k ? c.green : c.red
   ;['.env.template', 'apps/web/', '  .env.template', '  .env', 'apps/mobile/', '  .env.template', '  .env'].forEach((f, j) =>
     text(g, f, 20, 96 + j * 40, 22, f === '  .env' ? env : c.text, f === '  .env' ? 700 : 400, mono),
   )
   code(g, ['NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}', 'NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}'], 270, 104, 20)
   box(g, 250, h - 230, w - 250, 230, '#0e0f12')
   const lines: [string, string][][] = [
-    [[`ready: ${branches[i]}`, c.muted]],
     [['$ cp .env.example apps/web/.env', c.text], ['$ cp .env.example apps/mobile/.env', c.text], ['✗ SUPABASE_URL is not set', c.red]],
     [['$ envwire', c.text], ['compiled .env', c.green], ['compiled apps/web/.env', c.green], ['compiled apps/mobile/.env', c.green]],
   ]
-  let budget = Math.floor(p * 120)
-  lines[k].forEach(([s, color], j) => {
+  let budget = Math.floor((k > 1 ? 1 : p) * 120)
+  lines[Math.min(k, 1)].forEach(([s, color], j) => {
     text(g, s.slice(0, Math.max(0, budget)), 272, h - 180 + j * 46, 30, color, 600, mono)
     budget -= s.length
   })
@@ -375,11 +338,9 @@ const pills: [row: number, name: string, kind?: 'merged' | 'behind'][] = [
 ]
 const lanes = ['#4c9df0', '#c084fc', '#f0b74c', '#2dd4bf']
 
-function graph(g: G, k: number, p: number, top: number, rowH: number, vscode: boolean) {
+function graph(g: G, clean: number, forward: number, top: number, rowH: number) {
   const { width: w } = g.canvas
-  const clean = phase(k, 2, p) > 0.55 ? phase(k, 2, (p - 0.55) / 0.45) : 0
-  const forward = phase(k, 3, p) > 0.55 ? phase(k, 3, (p - 0.55) / 0.45) : 0
-  const x0 = vscode ? 90 : 20
+  const x0 = 20
   const y = (r: number) => top + rowH * (r - clean * [4, 5].filter((m) => m < r).length + 0.5)
   const lx = (lane: number) => x0 + 24 + lane * 30
   const gone = (r: number) => r === 4 || r === 5
@@ -406,16 +367,16 @@ function graph(g: G, k: number, p: number, top: number, rowH: number, vscode: bo
       if ((moved ? 0 : row) !== r) continue
       g.globalAlpha = gone(r) ? 1 - clean : kind === 'behind' ? Math.abs(1 - forward * 2) : 1
       g.font = `500 20px ${sans}`
-      const pw = g.measureText(name).width + (kind === 'merged' && !vscode ? 96 : 26) + (name === 'main' && !vscode ? 70 : 0)
-      box(g, mx, y(r) - 17, pw, 34, vscode ? lanes[lane] : '#161616', vscode ? 4 : 6)
-      if (!vscode) box(g, mx, y(r) - 17, 3, 34, '#3fb950')
+      const pw = g.measureText(name).width + (kind === 'merged' ? 96 : 26) + (name === 'main' ? 70 : 0)
+      box(g, mx, y(r) - 17, pw, 34, '#161616', 6)
+      box(g, mx, y(r) - 17, 3, 34, '#3fb950')
       let px = mx + 12
-      if (name === 'main' && !vscode) {
+      if (name === 'main') {
         box(g, px - 4, y(r) - 12, 62, 24, '#1d4ed8', 4)
         px = text(g, 'HEAD', px + 2, y(r) + 7, 15, '#dbeafe', 700) + 14
       }
-      px = text(g, name, px, y(r) + 7, 20, vscode ? '#111' : ps.text, 500)
-      if (kind === 'merged' && !vscode) text(g, ` #6${r} merged`, px, y(r) + 7, 16, '#a371f7', 500)
+      px = text(g, name, px, y(r) + 7, 20, ps.text, 500)
+      if (kind === 'merged') text(g, ` #6${r} merged`, px, y(r) + 7, 16, '#a371f7', 500)
       mx += pw + 10
     }
     g.globalAlpha = gone(r) ? 1 - clean : 1
@@ -459,60 +420,51 @@ function icon(g: G, kind: number, x: number, y: number) {
 function dialog(g: G, title: string, lines: string[], listTitle: string, list: string[], action: string, danger: boolean, pressed: boolean) {
   const { width: w } = g.canvas
   const x = w / 2 - 330
+  const ly = 214 + lines.length * 30 + 10
+  const by = ly + 46 + list.length * 30 + 40
   box(g, 0, 0, w, g.canvas.height, '#000000aa')
-  box(g, x, 120, 660, 470, '#141414', 18)
+  box(g, x, 120, 660, by - 120 + 76, '#141414', 18)
   text(g, title, x + 32, 172, 28, '#fafafa', 700)
   lines.forEach((line, i) => text(g, line, x + 32, 214 + i * 30, 19, '#a3a3a3', 400))
-  const ly = 214 + lines.length * 30 + 10
   box(g, x + 32, ly, 596, 46 + list.length * 30, '#0d0d0d', 12)
   text(g, listTitle, x + 50, ly + 34, 20, '#fafafa', 600)
   list.forEach((item, i) => text(g, item, x + 50, ly + 68 + i * 30, 18, '#a3a3a3', 400, mono))
-  box(g, x + 380, 520, 96, 46, '#1c1c1c', 10)
-  text(g, 'Cancel', x + 398, 550, 19, '#fafafa', 500)
-  box(g, x + 488, 520, 140, 46, danger ? (pressed ? '#7f1d1d' : '#3b1414') : pressed ? '#d4d4d4' : '#fafafa', 10)
-  text(g, action, x + 500, 550, 19, danger ? '#f87171' : '#111', 600)
+  box(g, x + 380, by, 96, 46, '#1c1c1c', 10)
+  text(g, 'Cancel', x + 398, by + 30, 19, '#fafafa', 500)
+  box(g, x + 488, by, 140, 46, danger ? (pressed ? '#7f1d1d' : '#3b1414') : pressed ? '#d4d4d4' : '#fafafa', 10)
+  text(g, action, x + 500, by + 30, 19, danger ? '#f87171' : '#111', 600)
 }
+
+const span = (p: number, from: number, to: number) => Math.min(1, Math.max(0, (p - from) / (to - from)))
 
 export const gitNav: Paint = (g, k, p) => {
   const { width: w, height: h } = g.canvas
-  if (k === 0) {
-    box(g, 0, 0, w, h, '#1e1e1e')
-    box(g, 0, 0, w, 40, '#323233')
-    text(g, 'eupersona · Visual Studio Code', w / 2 - 150, 27, 17, '#cccccc', 400)
-    box(g, 0, 40, 64, h - 40, '#333333')
-    box(g, 64, 40, w - 64, 44, '#252526')
-    box(g, 64, 40, 150, 44, '#1e1e1e')
-    text(g, 'Git Graph', 88, 69, 17, '#ffffff', 400)
-    ;['Graph', 'Description', 'Author', 'Date', 'Commit'].forEach((col, i) =>
-      text(g, col, [100, 260, w - 500, w - 330, w - 150][i], 118, 17, '#cccccc', 600),
-    )
-    return graph(g, 0, 0, 136, 64, true)
-  }
+  const t = k < 3 ? 0 : p
+  const clean = span(t, 0.3, 0.42)
+  const forward = span(t, 0.82, 0.94)
   box(g, 0, 0, w, h, '#0a0a0a')
   box(g, 0, 0, w, 50, '#202124')
   box(g, 120, 9, w - 240, 32, '#303134', 16)
   text(g, '192.168.1.20:4300', 146, 31, 17, '#bdc1c6', 400)
   box(g, 16, 62, 120, 40, '#1c1c1c', 8)
   text(g, 'Graph  ×', 34, 89, 19, '#fafafa', 500)
-  const cleaned = k > 2 || (k === 2 && p > 0.55)
-  const forwarded = k === 3 && p > 0.55
-  const tools: [string, string, number][] = [['View', '', 0], ['Stash', '', 0], ['', cleaned ? '' : '2', 2], ['', forwarded ? '' : '2', 3]]
+  const tools: [string, string, number][] = [['View', '', 0], ['Stash', '', 0], ['', clean ? '' : '2', 0.05], ['', forward ? '' : '2', 0.5]]
   let tx = w - 30
-  for (const [label, count, step] of tools.reverse()) {
+  for (const [label, count, press] of tools.reverse()) {
     g.font = `500 19px ${sans}`
-    const tw = g.measureText(label + count).width + (step ? 56 : 30)
+    const tw = g.measureText(label + count).width + (press ? 56 : 30)
     tx -= tw + 8
-    box(g, tx, 114, tw, 40, step === k && p < 0.1 ? '#2a2a2a' : '#121212', 8)
-    if (step) icon(g, step, tx + 14, 122)
-    text(g, label || count, tx + (step ? 40 : 15), 141, 19, '#fafafa', 500)
+    box(g, tx, 114, tw, 40, press && Math.abs(t - press) < 0.04 ? '#2a2a2a' : '#121212', 8)
+    if (press) icon(g, press < 0.3 ? 2 : 3, tx + 14, 122)
+    text(g, label || count, tx + (press ? 40 : 15), 141, 19, '#fafafa', 500)
   }
   ;['COMMIT', 'AUTHOR', 'DATE', 'COMMIT'].forEach((col, i) => text(g, col, [190, w - 500, w - 330, w - 150][i], 192, 16, '#a3a3a3', 600))
-  graph(g, k, p, 206, 58, false)
-  if (k === 2 && p <= 0.55)
+  graph(g, clean, forward, 206, 58)
+  if (t > 0.05 && t < 0.3)
     dialog(g, 'Clean merged branches?', ['Selected local branches will be permanently deleted.', '☑ Delete branches whose changes already sit on the default', '   branch as one squashed commit, matched by content.'],
-      'Squash-merged pull requests', ['card-photos', 'nav-fix'], 'Clean branches', true, p > 0.4)
-  if (k === 3 && p <= 0.55)
-    dialog(g, 'Fast-forward branches?', ['Local branches with no commits ahead of the default', 'branch move to its tip.'], 'Will move', ['orchestrator', 'worktree-2'], 'Fast-forward', false, p > 0.4)
+      'Squash-merged pull requests', ['card-photos', 'nav-fix'], 'Clean branches', true, t > 0.25)
+  if (t > 0.5 && t < 0.82)
+    dialog(g, 'Fast-forward branches?', ['Local branches with no commits ahead of the default', 'branch move to its tip.'], 'Will move', ['orchestrator', 'worktree-2'], 'Fast-forward', false, t > 0.77)
 }
 
 const light = { bg: '#ffffff', ink: '#0f172a', soft: '#475569', line: '#cbd5e1', accent: '#0f766e', field: '#f8fafc' }
@@ -520,7 +472,7 @@ const light = { bg: '#ffffff', ink: '#0f172a', soft: '#475569', line: '#cbd5e1',
 function intake(g: G, title: string, intro: string[], action: string) {
   const { width: w, height: h } = g.canvas
   box(g, 0, 0, w, h, light.bg)
-  statusBar(g, w, w / 16, 'ios')
+  statusBar(g, w, w / 16)
   g.fillStyle = light.ink
   box(g, 28, 80, w - 56, 6, '#e2e8f0', 3)
   box(g, 28, 80, (w - 56) * 0.4, 6, light.accent, 3)

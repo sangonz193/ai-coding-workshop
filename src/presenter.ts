@@ -1,7 +1,7 @@
 import './style.css'
 import { $, deck } from './deck'
 import { indexOf, move, stops, type Position } from './state'
-import { scenes } from './story'
+import { answers, scenes } from './story'
 import { latest, onLive, publish } from './sync'
 import { createWorkshop } from './workshop'
 
@@ -20,5 +20,12 @@ function show(p: Position) {
   $('counter').textContent = `Step ${p.step + 1} of ${scenes[p.scene].steps.length} · ${indexOf(p) + 1} of ${stops.length} overall`
 }
 
+$('answers').append(
+  ...answers.map(([question, answer]) => {
+    const item = document.createElement('details')
+    item.append(Object.assign(document.createElement('summary'), { textContent: question }), Object.assign(document.createElement('p'), { textContent: answer }))
+    return item
+  }),
+)
 onLive(show)
 show(latest())

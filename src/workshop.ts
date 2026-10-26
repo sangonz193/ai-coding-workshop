@@ -11,14 +11,14 @@ type Screen = { g: CanvasRenderingContext2D; map: THREE.CanvasTexture; scene: nu
 
 const at = (scene: number, step = 0) => indexOf({ scene, step })
 const spots = [[-11, -5], [0, -7], [11, -5], [11, 7], [0, 9], [-11, 7], [0, 1.5]]
+const stationOf = [0, 1, 2, 4, 5, 6]
 const shots: Record<string, number[]> = {
   0: [-0.9, 1, -0.8, 2], '0.1': [0.3, 0.7, -0.3, 1.6],
-  1: [-2.6, 0.8, -0.1, 2.4], '1.2': [-1.4, 1.6, 0, 1.4], '1.3': [2.3, 0.8, 0.2, 2.4], '1.4': [-0.5, 1.3, -0.4, 1.3],
-  '1.5': [-0.3, 1.9, -0.8, 2.6], '1.6': [0.2, 1.2, 0.3, 1.9], '1.7': [-2.4, 1.3, -1, 2.6],
-  2: [0.3, 0.8, -0.5, 1.35], '2.2': [-1.4, 0.9, -0.2, 1.9], 3: [0, 2.3, -0.6, 2],
-  4: [-0.2, 1, -0.1, 1.3], '4.2': [1.7, 1.9, -0.9, 2.3], '4.3': [0.6, 1, 0.1, 1.3],
-  5: [-1.6, 0.9, 0.7, 2.1], '5.2': [0.2, 0.9, -0.2, 1.45], '5.3': [2.2, 0.95, -0.8, 2], '5.4': [0, 0.9, 0, 1.45],
-  6: [0, -0.5, 1, 0.3],
+  1: [-2.6, 0.8, -0.1, 2.4], '1.2': [-1.4, 1.6, 0, 1.4], '1.3': [2.3, 0.8, 0.2, 2.4], '1.4': [-0.5, 1.3, -0.4, 1.3], '1.5': [-0.3, 1.9, -0.8, 2.6],
+  2: [0.3, 0.8, -0.5, 1.35], '2.1': [-1.4, 0.9, -0.2, 1.9], '2.2': [0, 2.3, -0.6, 2, 3], '2.3': [0, 2.3, -0.6, 2, 3],
+  3: [-0.2, 1, -0.1, 1.3], '3.2': [1.7, 1.9, -0.9, 2.3], '3.3': [0.6, 1, 0.1, 1.3],
+  4: [-1.6, 0.9, 0.7, 2.1], '4.2': [0.2, 0.9, -0.2, 1.45], '4.3': [2.2, 0.95, -0.8, 2], '4.4': [0, 0.9, 0, 1.45],
+  5: [0, -0.5, 1, 0.3],
 }
 const reduced = matchMedia('(prefers-reduced-motion: reduce)')
 const mat = (color: number, extra: THREE.MeshStandardMaterialParameters = {}) =>
@@ -103,13 +103,13 @@ export function createWorkshop(host: HTMLElement) {
     mount(panel, display(scene, paint, w * 0.97, w * 0.57, 1280, false, seconds), [0, w * 0.3, 0.031])
     return g
   }
-  const phone = (parent: THREE.Object3D, pos: V3, scene: number, paint: S.Paint, size: number, wide = false) => {
+  const phone = (parent: THREE.Object3D, pos: V3, scene: number, paint: S.Paint, size: number) => {
     const g = group(parent, pos)
-    const [w, h] = wide ? [size, size * 0.68] : [size * 0.48, size]
+    const [w, h] = [size * 0.48, size]
     box(g, [w * 0.7, 0.04, 0.4], M.metal, [0, 0, -0.1])
     const body = group(g, [0, 0.04, 0], 0, -0.2)
     box(body, [w, h, 0.07], M.black, [0, 0, 0], new RoundedBoxGeometry(w, h, 0.07, 4, Math.min(w, h) * 0.12))
-    mount(body, display(scene, paint, w * 0.9, h * 0.93, wide ? 800 : 420), [0, h / 2, 0.036])
+    mount(body, display(scene, paint, w * 0.9, h * 0.93, 420), [0, h / 2, 0.036])
     return g
   }
   const arrow = (parent: THREE.Object3D, x1: number, x2: number) => {
@@ -151,59 +151,56 @@ export function createWorkshop(host: HTMLElement) {
   const own = laptop(desk, [2.2, 0.12, 0.6], 1, S.remoteCoding, 1.8, -0.4)
   prop(own.g, at(1, 3), { lift: 0.8 })
   prop(own.lid, 0, { turn: [at(1, 4), Math.PI / 2] })
-  prop(phone(desk, [0.7, 0.12, 1], 1, S.remote('code'), 1.1), at(1, 3), { to: at(1, 4), lift: -0.5 })
+  prop(phone(desk, [0.7, 0.12, 1], 1, S.codePhone, 1.1), at(1, 3), { to: at(1, 4), lift: -0.5 })
   prop(monitor(desk, [-0.3, 0.12, -0.8], 1, S.paseo, 3, 3.5), at(1, 4), { lift: -1.2 })
-  prop(phone(desk, [-0.7, 0.12, 1.1], 1, S.remote('browser'), 1.1, true), at(1, 6), { lift: -0.5 })
-  ;(['ios', 'android'] as const).forEach((kind, i) => prop(phone(desk, [0.4 + i * 0.65, 0.12, 1.1], 1, S.remote(kind), 1), at(1, 6), { lift: -0.5 }))
-  prop(monitor(desk, [-2.6, 0.12, -1], 1, S.zen, 1.9, 3.5), at(1, 7), { lift: -1.2 })
 
   const copies = station(2, 8)
   const env = group(copies, [-3.2, 0.12, 0.6], 0.2)
   box(env, [1.3, 1.65, 0.05], M.card, [0, 0, 0])
   mount(env, display(2, S.envTemplate, 1.22, 1.55, 600), [0, 0.83, 0.026])
-  prop(env, at(2, 2), { lift: -1.2 })
+  prop(env, at(2, 1), { lift: -1.2 })
   ;[-1.6, 0.6, 2.8].forEach((x, i) =>
     prop(laptop(copies, [x, 0.12, -0.3], 2, S.worktree(i), 2, 0.1 * (1 - i)).g, at(2), { lift: 0.8 + i * 0.3 }),
   )
 
-  monitor(station(3), [0, 0.12, -0.6], 3, S.gitNav, 3.8, 4)
+  monitor(station(3), [0, 0.12, -0.6], 2, S.gitNav, 3.8, 6)
 
   const jam = station(4, 8)
-  monitor(jam, [1.7, 0.12, -0.9], 4, S.reviewLoop, 2.8)
+  monitor(jam, [1.7, 0.12, -0.9], 3, S.reviewLoop, 2.8)
   const hub = new THREE.Vector3(-1.4, 0.2, 0.1)
-  prop(box(jam, [0, 0.06, 0], M.brass, [hub.x, 0.14, hub.z], new THREE.TorusGeometry(1, 0.05, 12, 64).rotateX(Math.PI / 2)), 0, { to: at(4, 3) })
+  prop(box(jam, [0, 0.06, 0], M.brass, [hub.x, 0.14, hub.z], new THREE.TorusGeometry(1, 0.05, 12, 64).rotateX(Math.PI / 2)), 0, { to: at(3, 3) })
   for (const [label, dx] of [['Review', 1.45], ['Fix', -1.45]] as const) {
     const post = group(jam, [hub.x + dx, 0.12, hub.z - 0.2])
     box(post, [0.8, 0.36, 0.03], M.card, [0, 0, 0])
-    mount(post, display(4, S.sign(label), 0.76, 0.32, 256), [0, 0.18, 0.016])
-    prop(post, 0, { to: at(4, 3) })
+    mount(post, display(3, S.sign(label), 0.76, 0.32, 256), [0, 0.18, 0.016])
+    prop(post, 0, { to: at(3, 3) })
   }
   const spin = (o: THREE.Object3D, t: number) => {
     o.position.set(hub.x + Math.cos(t * 1.2), 0.2, hub.z + Math.sin(t * 1.2))
     o.rotation.y = -t * 1.2
   }
-  prop(card(jam, 4, 'Fix login redirect', [hub.x + 1, 0.2, hub.z], 0.9), 0, { to: at(4, 3), tick: spin })
+  prop(card(jam, 3, 'Fix login redirect', [hub.x + 1, 0.2, hub.z], 0.9), 0, { to: at(3, 3), tick: spin })
   for (let i = 0; i < 6; i++) {
     const title = ['Dark mode', 'Search filters', 'Nav fix', 'Export to CSV', 'Onboarding', 'Auth refactor'][i]
-    const waiting = card(jam, 4, title, [-3.4 + i * 0.75, 0.12 + (i % 2) * 0.035, 1.65], 0.9, (i % 2 ? 0.12 : -0.1))
-    prop(waiting, at(4, 1), { lift: 1 + i * 0.25, shift: [at(4, 3), [2.6, 0, 0]] })
+    const waiting = card(jam, 3, title, [-3.4 + i * 0.75, 0.12 + (i % 2) * 0.035, 1.65], 0.9, (i % 2 ? 0.12 : -0.1))
+    prop(waiting, at(3, 1), { lift: 1 + i * 0.25, shift: [at(3, 3), [2.6, 0, 0]] })
   }
-  prop(box(jam, [7, 0.02, 0.08], M.brass, [0, 0.12, 1.65]), at(4, 3), { lift: -0.2 })
+  prop(box(jam, [7, 0.02, 0.08], M.brass, [0, 0.12, 1.65]), at(3, 3), { lift: -0.2 })
 
   const flow = station(5, 7)
-  prop(phone(flow, [-3, 0.12, 0.8], 5, S.capture, 1.5), 0, { shift: [at(5, 1), [0.7, 0, 0]] })
-  prop(phone(flow, [-1.6, 0.12, 0.8], 5, S.review, 1.5), 0, { to: at(5, 4), shift: [at(5, 1), [0, 0, -1.3]] })
-  prop(phone(flow, [-0.2, 0.12, 0.8], 5, S.form, 1.5), 0, { shift: [at(5, 1), [-0.7, 0, 0]] })
-  for (const [x1, x2] of [[-2.62, -1.98], [-1.22, -0.58]]) prop(arrow(flow, x1, x2), 0, { to: at(5, 1) })
-  prop(arrow(flow, -1.92, -1.28), at(5, 1))
-  laptop(flow, [2, 0.12, -0.1], 5, S.source, 2.4, -0.35)
+  prop(phone(flow, [-3, 0.12, 0.8], 4, S.capture, 1.5), 0, { shift: [at(4, 1), [0.7, 0, 0]] })
+  prop(phone(flow, [-1.6, 0.12, 0.8], 4, S.review, 1.5), 0, { to: at(4, 4), shift: [at(4, 1), [0, 0, -1.3]] })
+  prop(phone(flow, [-0.2, 0.12, 0.8], 4, S.form, 1.5), 0, { shift: [at(4, 1), [-0.7, 0, 0]] })
+  for (const [x1, x2] of [[-2.62, -1.98], [-1.22, -0.58]]) prop(arrow(flow, x1, x2), 0, { to: at(4, 1) })
+  prop(arrow(flow, -1.92, -1.28), at(4, 1))
+  laptop(flow, [2, 0.12, -0.1], 4, S.source, 2.4, -0.35)
 
   const ring = spots.length - 1
   spots.slice(0, ring).forEach(([x, z], i) => {
     const [nx, nz] = spots[(i + 1) % ring]
     const path = box(scene, [0.14, 0.03, Math.hypot(nx - x, nz - z)], M.brass, [(x + nx) / 2, 0, (z + nz) / 2])
     path.rotation.y = Math.atan2(nx - x, nz - z)
-    prop(path, at(ring, 1), { lift: 0.3 })
+    prop(path, at(scenes.length - 1, 1), { lift: 0.3 })
   })
 
   const camera = new THREE.OrthographicCamera()
@@ -218,7 +215,7 @@ export function createWorkshop(host: HTMLElement) {
   const goalView = { ...view }
   new ResizeObserver(() => {
     const { clientWidth: w, clientHeight: h } = host
-    renderer.setSize(w, h)
+    renderer.setSize(w, h, false)
     const halfW = Math.max(4.5, (4 * w) / h)
     Object.assign(camera, { left: -halfW, right: halfW, top: (halfW * h) / w, bottom: (-halfW * h) / w })
     camera.setViewOffset(w, h, w > h ? -w * 0.1 : 0, 0, w, h)
@@ -271,10 +268,10 @@ export function createWorkshop(host: HTMLElement) {
     show(p: Position) {
       pos = p
       current = indexOf(p)
-      const [dx, y, dz, zoom] = shots[`${p.scene}.${p.step}`] ?? shots[p.scene]
-      goal.set(spots[p.scene][0] + dx, y, spots[p.scene][1] + dz)
+      const [dx, y, dz, zoom, spot = stationOf[p.scene]] = shots[`${p.scene}.${p.step}`] ?? shots[p.scene]
+      goal.set(spots[spot][0] + dx, y, spots[spot][1] + dz)
       goalZoom = zoom
-      Object.assign(goalView, p.scene === spots.length - 1 ? { turn: Math.PI / 4, pitch: 0.75 } : { turn: 0, pitch: 0.42 })
+      Object.assign(goalView, p.scene === scenes.length - 1 ? { turn: Math.PI / 4, pitch: 0.75 } : { turn: 0, pitch: 0.42 })
     },
   }
 }

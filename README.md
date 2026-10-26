@@ -28,7 +28,7 @@ The story and visual direction are still being developed.
 
 ## Workshop prototype
 
-A miniature workshop rendered with three.js: the camera moves between desks whose laptops, monitors and phones show each part of the story on interfaces recreated from each app’s real design (generated code piling up as pull requests, VS Code windows multiplying with every worktree until the code client and then Paseo replaced them, a forked conversation, worktrees compiling their env files from committed templates, a branch graph being cleaned up, a review loop jamming work until it became one review, one fix and one confirmation, and the Eupersona review screen being removed), then pulls back to the whole workshop.
+A miniature workshop rendered with three.js: the camera moves between desks whose laptops, monitors and phones show each part of the story on interfaces recreated from each app’s real design (generated code piling up as pull requests, VS Code windows multiplying with every worktree until the code client and then Paseo replaced them, a conversation forked to another provider with local notes as context, worktrees compiling their env files from committed templates, a branch graph being cleaned up, a review loop jamming work until it became one review, one fix and one confirmation, and the Eupersona review screen being removed), then pulls back to the whole workshop.
 
 ```sh
 pnpm install
@@ -36,7 +36,7 @@ pnpm dev        # http://localhost:4313
 ```
 
 - `/` is the audience view. It follows the presenter, can switch to independent exploration, and can rejoin the live scene.
-- `/presenter.html` has previous/next, chapter selection, step reveals, speaker notes, and the next caption.
+- `/presenter.html` has previous/next, chapter selection, step reveals, speaker notes, the next caption, and prepared answers to likely audience questions.
 
 Presenter and audience tabs synchronize within one browser using `BroadcastChannel`, and the latest scene is kept in `localStorage` so late joiners land on it.
 
