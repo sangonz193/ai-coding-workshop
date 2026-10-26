@@ -249,16 +249,10 @@ export const vscode: Paint = (g, k, p) => {
   text(g, 'theme.tsx · eupersona', w / 2 - 100, 23, 16, '#cccccc', 400)
   box(g, 0, 34, 48, h - 34, '#333333')
   box(g, 48, 34, 200, h - 34, '#252526')
-  vsFiles.forEach((f, i) => {
-    text(g, f, 58, 64 + i * 28, 16, i === 2 ? '#ffffff' : '#cccccc', i ? 400 : 700)
-    if (k >= 5 && i % 3 && i) text(g, 'M', 226, 64 + i * 28, 15, '#e2c08d', 700)
-  })
   box(g, 0, h - 26, w, 26, '#007acc')
   text(g, k >= 3 ? '⎇ main*' : '⎇ main', 14, h - 8, 15, '#ffffff', 500)
-  if (k >= 5) {
-    box(g, 26, 118, 22, 22, '#007acc', 11)
-    text(g, '14', 29, 135, 13, '#ffffff', 700)
-  }
+  if (k >= 5) return collision(g)
+  vsFiles.forEach((f, i) => text(g, f, 58, 64 + i * 28, 16, i === 2 ? '#ffffff' : '#cccccc', i ? 400 : 700))
   const right = k >= 2 ? 340 : 0
   const fs = right ? 17 : 19
   const lh = fs * 1.55
@@ -271,7 +265,6 @@ export const vscode: Paint = (g, k, p) => {
   })
   clipped(g, 248, 34, w - right - 260, h - 60, () => {
     if (k >= 3) lines.forEach((_, i) => i > 0 && i < 5 && box(g, 248, 76 - fs + 2 + i * lh, w - right - 248, lh - 2, '#1f3a26'))
-    if (k >= 5) [2, 3].forEach((i) => box(g, 248, 76 - fs + 2 + i * lh, w - right - 248, lh - 2, '#1e3350'))
     code(g, lines, 262, 76, fs)
     if (k === 1) text(g, theme[4].trim(), 262 + 19 * 2.4 + 6 * 11.4, 76 + 4 * 29.5, 19, '#6a6a6a', 400, mono)
   })
@@ -297,9 +290,57 @@ export const vscode: Paint = (g, k, p) => {
     if (k === 4) box(g, w - 54, h - 82, 24, 24, '#cccccc', 4)
     return
   }
-  vsPanel(g, 'AGENT 1 · dark mode', x + 16, 64, right - 32, [['tool', 'Editing theme.tsx']])
-  vsPanel(g, 'AGENT 2 · login redirect', x + 16, 190, right - 32, [['tool', 'Editing theme.tsx'], ['tool', 'Editing session.ts']])
-  vsPanel(g, 'AGENT 3 · search', x + 16, 346, right - 32, [['tool', 'Editing settings.tsx']])
+}
+
+const agentColors = ['#4ec9b0', '#569cd6', '#c586c0']
+const settingsFile: [string, number][] = [
+  ['export function Settings() {', -1], ['  return (', -1], ['    <Page title="Settings">', -1], ['      <ThemeToggle />', 0],
+  ['      <SearchBox query={q}', 1], ['      <Profile />', -1], ['    </Page>', -1], ['  )', -1], ['}', -1],
+]
+const pile: [file: string, status: string, by: number[]][] = [
+  ['settings.tsx', 'M', [0, 1]], ['theme.tsx', 'M', [0]], ['ThemeToggle.tsx', 'A', [0]], ['SearchBox.tsx', 'A', [1]],
+  ['search.ts', 'A', [1]], ['login.tsx', 'M', [2]], ['session.ts', 'M', [2]], ['redirect.test.ts', 'M', [2]],
+]
+
+function collision(g: G) {
+  const { width: w, height: h } = g.canvas
+  box(g, 0, 0, w, 34, '#3c3c3c')
+  text(g, 'settings.tsx · eupersona', w / 2 - 110, 23, 16, '#cccccc', 400)
+  box(g, 26, 118, 22, 22, '#007acc', 11)
+  text(g, String(pile.length), 33, 135, 13, '#ffffff', 700)
+  const side = 270
+  box(g, 48, 34, side - 48, h - 60, '#252526')
+  text(g, 'SOURCE CONTROL', 60, 62, 14, '#bbbbbb', 700)
+  box(g, 58, 76, side - 70, 36, '#3c3c3c', 4)
+  text(g, 'Message', 68, 100, 15, '#8b8b8b', 400)
+  box(g, 58, 120, side - 70, 34, '#0e639c', 4)
+  text(g, '✓ Commit', 58 + (side - 70) / 2 - 36, 143, 15, '#ffffff', 600)
+  text(g, `Changes  ${pile.length}`, 60, 184, 14, '#cccccc', 700)
+  pile.forEach(([file, status, by], i) => {
+    const y = 214 + i * 30
+    by.forEach((a, j) => box(g, 62 + j * 12, y - 10, 9, 9, agentColors[a], 5))
+    text(g, file, 90, y, 15, '#cccccc', 400)
+    text(g, status, side - 26, y, 15, status === 'A' ? '#73c991' : '#e2c08d', 700)
+  })
+  const right = 340
+  clipped(g, side, 34, w - right - side, h - 60, () => {
+    settingsFile.forEach(([, by], i) => by >= 0 && box(g, side, 59 + i * 26.35, w - right - side, 24, agentColors[by] + '40'))
+    code(g, settingsFile.map(([line]) => line), side + 12, 76, 17)
+  })
+  const x = w - right
+  box(g, x, 34, right, h - 60, '#252526')
+  const cards: [string, Item[]][] = [
+    ['dark mode', [['tool', 'Edited settings.tsx'], ['tool', 'Ran tests']]],
+    ['search', [['tool', 'Editing settings.tsx']]],
+    ['login redirect', [['tool', 'Edited login.tsx'], ['tool', 'Edited session.ts']]],
+  ]
+  cards.forEach(([task, items], i) => {
+    const y = 64 + i * 150
+    box(g, x + 16, y - 11, 10, 10, agentColors[i], 5)
+    text(g, `AGENT · ${task}`, x + 32, y, 16, '#bbbbbb', 700)
+    transcript(g, items, x + 16, y + 18, right - 32, 17)
+  })
+  text(g, '✗ SearchBox is not defined', x + 16, 64 + 18 + 2 * 17 * 1.8 + 14, 16, '#f48771', 600)
 }
 
 const copies = [
