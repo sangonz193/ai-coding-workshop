@@ -87,9 +87,27 @@ export function createWorkshop(host: HTMLElement) {
     mesh.position.set(x, y, z)
     parent.add(mesh)
   }
+  const blur = (() => {
+    const canvas = Object.assign(document.createElement('canvas'), { width: 128, height: 128 })
+    const g = canvas.getContext('2d')!
+    g.filter = 'blur(10px)'
+    g.fillStyle = '#000'
+    g.beginPath()
+    g.roundRect(24, 24, 80, 80, 12)
+    g.fill()
+    return new THREE.CanvasTexture(canvas)
+  })()
+  // The sun is high and in front, so cast shadows mostly hide behind objects; a soft patch underneath grounds them.
+  const contact = (parent: THREE.Object3D, w: number, d: number, z = 0) => {
+    const patch = new THREE.Mesh(new THREE.PlaneGeometry(w * 1.6, d * 1.6), new THREE.MeshBasicMaterial({ map: blur, transparent: true, opacity: 0.55, depthWrite: false }))
+    patch.rotation.x = -Math.PI / 2
+    patch.position.set(0, 0.004, z)
+    parent.add(patch)
+  }
   const laptop = (parent: THREE.Object3D, pos: V3, scene: number, paint: S.Paint, w: number, ry = 0, live = false) => {
     const g = group(parent, pos, ry)
     const d = w * 0.68
+    contact(g, w, d)
     box(g, [w, 0.06, d], M.metal, [0, 0, 0], new RoundedBoxGeometry(w, 0.06, d, 2, 0.03))
     box(g, [w * 0.84, 0.01, d * 0.42], M.black, [0, 0.06, -d * 0.1])
     const lid = group(g, [0, 0.06, -d / 2], 0, -0.25)
@@ -99,6 +117,7 @@ export function createWorkshop(host: HTMLElement) {
   }
   const monitor = (parent: THREE.Object3D, pos: V3, scene: number, paint: S.Paint, w: number, seconds?: number) => {
     const g = group(parent, pos)
+    contact(g, w * 0.3, w * 0.18)
     box(g, [w * 0.3, 0.04, w * 0.18], M.metal, [0, 0, 0])
     box(g, [0.14, w * 0.3, 0.06], M.metal, [0, 0.04, -0.06])
     const panel = group(g, [0, w * 0.3, 0], 0, -0.08)
@@ -109,6 +128,7 @@ export function createWorkshop(host: HTMLElement) {
   const phone = (parent: THREE.Object3D, pos: V3, scene: number, paint: S.Paint, size: number) => {
     const g = group(parent, pos)
     const [w, h] = [size * 0.48, size]
+    contact(g, w * 0.7, 0.4, -0.1)
     box(g, [w * 0.7, 0.04, 0.4], M.metal, [0, 0, -0.1])
     const body = group(g, [0, 0.04, 0], 0, -0.2)
     box(body, [w, h, 0.07], M.black, [0, 0, 0], new RoundedBoxGeometry(w, h, 0.07, 4, Math.min(w, h) * 0.12))
