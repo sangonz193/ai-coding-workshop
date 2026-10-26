@@ -151,7 +151,7 @@ export function createWorkshop(host: HTMLElement) {
   const own = laptop(desk, [2.2, 0.12, 0.6], 1, S.remoteCoding, 1.8, -0.4)
   prop(own.g, at(1, 3), { lift: 0.8 })
   prop(own.lid, 0, { turn: [at(1, 4), Math.PI / 2] })
-  prop(phone(desk, [0.7, 0.12, 1], 1, S.codePhone, 1.1), at(1, 3), { to: at(1, 4), lift: -0.5 })
+  prop(phone(desk, [1.15, 0.12, 1.3], 1, S.codePhone, 1.1), at(1, 3), { to: at(1, 4), lift: -0.5 })
   prop(monitor(desk, [-0.3, 0.12, -0.8], 1, S.paseo, 3, 3.5), at(1, 4), { lift: -1.2 })
 
   const copies = station(2, 8)
@@ -169,7 +169,7 @@ export function createWorkshop(host: HTMLElement) {
   monitor(jam, [1.7, 0.12, -0.9], 3, S.reviewLoop, 2.8)
   const hub = new THREE.Vector3(-1.4, 0.2, 0.1)
   prop(box(jam, [0, 0.06, 0], M.brass, [hub.x, 0.14, hub.z], new THREE.TorusGeometry(1, 0.05, 12, 64).rotateX(Math.PI / 2)), 0, { to: at(3, 3) })
-  for (const [label, dx] of [['Review', 1.45], ['Fix', -1.45]] as const) {
+  for (const [label, dx] of [['Review', 1.8], ['Fix', -1.8]] as const) {
     const post = group(jam, [hub.x + dx, 0.12, hub.z - 0.2])
     box(post, [0.8, 0.36, 0.03], M.card, [0, 0, 0])
     mount(post, display(3, S.sign(label), 0.76, 0.32, 256), [0, 0.18, 0.016])
@@ -189,7 +189,7 @@ export function createWorkshop(host: HTMLElement) {
 
   const flow = station(5, 7)
   prop(phone(flow, [-3, 0.12, 0.8], 4, S.capture, 1.5), 0, { shift: [at(4, 1), [0.7, 0, 0]] })
-  prop(phone(flow, [-1.6, 0.12, 0.8], 4, S.review, 1.5), 0, { to: at(4, 4), shift: [at(4, 1), [0, 0, -1.3]] })
+  prop(phone(flow, [-1.6, 0.12, 0.8], 4, S.review, 1.5), 0, { to: at(4, 4), shift: [at(4, 1), [0, 0.35, -2]] })
   prop(phone(flow, [-0.2, 0.12, 0.8], 4, S.form, 1.5), 0, { shift: [at(4, 1), [-0.7, 0, 0]] })
   for (const [x1, x2] of [[-2.62, -1.98], [-1.22, -0.58]]) prop(arrow(flow, x1, x2), 0, { to: at(4, 1) })
   prop(arrow(flow, -1.92, -1.28), at(4, 1))

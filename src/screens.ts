@@ -24,6 +24,31 @@ function text(g: G, s: string, x: number, y: number, size: number, fill = c.text
   return x + g.measureText(s).width
 }
 
+const fit = (g: G, s: string, max: number) => {
+  if (g.measureText(s).width <= max) return s
+  while (s.length > 1 && g.measureText(s + '…').width > max) s = s.slice(0, -1)
+  return s + '…'
+}
+
+function clipped(g: G, x: number, y: number, w: number, h: number, draw: () => void) {
+  g.save()
+  g.beginPath()
+  g.rect(x, y, w, h)
+  g.clip()
+  draw()
+  g.restore()
+}
+
+function wrap(g: G, s: string, max: number) {
+  const lines = ['']
+  for (const word of s.split(' ')) {
+    const next = lines[lines.length - 1] ? `${lines[lines.length - 1]} ${word}` : word
+    if (g.measureText(next).width > max && lines[lines.length - 1]) lines.push(word)
+    else lines[lines.length - 1] = next
+  }
+  return lines
+}
+
 function chrome(g: G, title: string, url?: string) {
   const { width: w, height: h } = g.canvas
   box(g, 0, 0, w, h, c.bg)
@@ -55,7 +80,7 @@ export const generating: Paint = (g, _k, _p, t) => {
   const { width: w, height: h } = g.canvas
   chrome(g, 'settings.tsx')
   const n = Math.floor(t * 4)
-  code(g, Array.from({ length: 12 }, (_, i) => settings[(n + i) % settings.length]), 40, 110, 28, n + 1)
+  clipped(g, 0, 56, w, h - 160, () => code(g, Array.from({ length: 12 }, (_, i) => settings[(n + i) % settings.length]), 40, 110, 28, n + 1))
   box(g, 40, h - 92, w - 80, 64, c.raised, 32)
   text(g, 'Build the settings screen', 76, h - 50, 28, c.muted)
 }
@@ -110,11 +135,12 @@ function paseoFrame(g: G, branch: string, tabs: [string, string, boolean][], mod
   tree.forEach(([name, depth, stat], i) => {
     const y = 150 + i * 52
     if (name === branch) box(g, 10, y - 32, 280, 48, '#1c1c1c', 10)
-    text(g, name.length > 18 && stat ? name.slice(0, 16) + '…' : name, 24 + depth * 26, y, 21, ps.text, depth ? 400 : 600)
-    if (stat) {
-      g.font = `500 17px ${sans}`
-      text(g, stat, 288 - g.measureText(stat).width, y, 17, ps.muted, 500)
-    }
+    g.font = `500 17px ${sans}`
+    const statX = stat ? 288 - g.measureText(stat).width : 290
+    if (stat) text(g, stat, statX, y, 17, ps.muted, 500)
+    const size = depth ? 21 : 19
+    g.font = `${depth ? 400 : 600} ${size}px ${sans}`
+    text(g, fit(g, name, statX - 34 - depth * 26), 24 + depth * 26, y, size, ps.text, depth ? 400 : 600)
   })
   box(g, 26, h - 44, 12, 12, ps.green, 6)
   text(g, 'MacBook-Pro.local', 50, h - 32, 20, ps.muted)
@@ -158,9 +184,9 @@ export const paseo: Paint = (g, k, p) => {
     text(g, 'gitignored', fx + 180, 244, 15, ps.muted, 400)
   }
   if (k !== 5 || forked) return
-  box(g, area.x + 60, y + 4, 330, 120, '#1b1b1b', 12)
+  box(g, area.x + 60, y + 4, 330, 136, '#1b1b1b', 12)
   g.strokeStyle = ps.line
-  g.strokeRect(area.x + 60, y + 4, 330, 120)
+  g.strokeRect(area.x + 60, y + 4, 330, 136)
   text(g, 'Fork chat from here', area.x + 80, y + 42, 20, ps.text, 500)
   box(g, area.x + 70, y + 58, 310, 40, '#2a2a2a', 8)
   text(g, 'Fork in a new tab', area.x + 90, y + 85, 20, ps.text, 500)
@@ -199,7 +225,8 @@ export const vscode: Paint = (g, k) => {
   box(g, 48, 34, 200, h - 34, '#252526')
   vsFiles.forEach((f, i) => text(g, f, 58, 64 + i * 28, 15, i === 3 ? '#ffffff' : '#cccccc', i ? 400 : 700))
   const right = k >= 1 ? 330 : 0
-  code(g, ["export function Theme() {", "  const [dark, setDark] = useState(false)", "  return (", "    <Toggle checked={dark}", "      onChange={setDark} />", "  )", "}"], 262, 70, 17)
+  const theme = ['export function Theme() {', '  const [dark, setDark] = useDark()', '  return (', '    <Toggle checked={dark}', '      onChange={setDark} />', '  )', '}']
+  clipped(g, 248, 34, w - right - 260, h - 34, () => code(g, theme, 262, 70, 17))
   if (!right) return
   box(g, w - right, 34, right, h - 34, '#252526')
   ;['Copilot', 'Claude', 'Codex'].reduce((x, tab, i) => text(g, tab, x, 62, 15, i ? '#8b8b8b' : '#ffffff', 600) + 18, w - right + 14)
@@ -221,7 +248,7 @@ export const vscodeWindow = (i: number): Paint => (g) => {
   text(g, `eupersona · ${worktreeNames[i]}`, 92, 27, 18, '#cccccc', 400)
   box(g, 0, 40, 34, h - 40, '#333333')
   box(g, 34, 40, 140, h - 40, '#252526')
-  for (let j = 0; j < 7; j++) box(g, 196, 66 + j * 30, 120 + ((i * 37 + j * 53) % 240), 12, j % 3 ? '#3a6ea5' : '#9cdcfe', 6)
+  for (let j = 0; j < 7; j++) box(g, 196, 66 + j * 30, Math.min(w - 220, 120 + ((i * 37 + j * 53) % 240)), 12, j % 3 ? '#3a6ea5' : '#9cdcfe', 6)
 }
 
 const codeChat: Item[] = [['user', 'Fix the login redirect'], ['tool', 'Read  app/login/page.tsx'], ['ai', 'Fixed. 2 files changed.']]
@@ -314,10 +341,11 @@ export const reviewLoop: Paint = (g, k, p) => {
   if (k < 2) return
   transcript(g, [['user', 'status?'], ['user', 'status?'], ['user', 'why did you stop working?']], area.x + 540, area.y, area.w - 540, 21)
   g.globalAlpha = p
-  box(g, area.x + 520, y - 40, area.w - 520, 150, '#2a2214', 16)
-  text(g, 'You already do this work now,', area.x + 544, y + 6, 26, '#e5b45b', 700)
-  text(g, 'just later and angrier.', area.x + 544, y + 44, 26, '#e5b45b', 700)
-  text(g, 'AI review of my chats, Oct 16', area.x + 544, y + 86, 18, ps.muted, 400)
+  g.font = `700 26px ${sans}`
+  const quote = wrap(g, 'You already do this work now, just later and angrier.', area.w - 568)
+  box(g, area.x + 520, y - 40, area.w - 520, 92 + quote.length * 38, '#2a2214', 16)
+  quote.forEach((line, i) => text(g, line, area.x + 544, y + 6 + i * 38, 26, '#e5b45b', 700))
+  text(g, 'AI review of my chats, Oct 16', area.x + 544, y + 30 + quote.length * 38, 18, ps.muted, 400)
   g.globalAlpha = 1
 }
 
@@ -366,8 +394,11 @@ function graph(g: G, clean: number, forward: number, top: number, rowH: number) 
       const moved = kind === 'behind' && forward >= 0.5
       if ((moved ? 0 : row) !== r) continue
       g.globalAlpha = gone(r) ? 1 - clean : kind === 'behind' ? Math.abs(1 - forward * 2) : 1
+      g.font = `500 16px ${sans}`
+      const suffix = kind === 'merged' ? ` #6${r} merged` : ''
+      const suffixW = g.measureText(suffix).width
       g.font = `500 20px ${sans}`
-      const pw = g.measureText(name).width + (kind === 'merged' ? 96 : 26) + (name === 'main' ? 70 : 0)
+      const pw = g.measureText(name).width + suffixW + 26 + (name === 'main' ? 70 : 0)
       box(g, mx, y(r) - 17, pw, 34, '#161616', 6)
       box(g, mx, y(r) - 17, 3, 34, '#3fb950')
       let px = mx + 12
@@ -376,22 +407,17 @@ function graph(g: G, clean: number, forward: number, top: number, rowH: number) 
         px = text(g, 'HEAD', px + 2, y(r) + 7, 15, '#dbeafe', 700) + 14
       }
       px = text(g, name, px, y(r) + 7, 20, ps.text, 500)
-      if (kind === 'merged') text(g, ` #6${r} merged`, px, y(r) + 7, 16, '#a371f7', 500)
+      if (suffix) text(g, suffix, px, y(r) + 7, 16, '#a371f7', 500)
       mx += pw + 10
     }
     g.globalAlpha = gone(r) ? 1 - clean : 1
     g.font = `400 20px ${sans}`
-    if (w - 520 - mx > 80) text(g, fit(g, msg, w - 520 - mx), mx + 6, y(r) + 7, 20, ps.text, 400)
+    if (w - 540 - mx > 80) text(g, fit(g, msg, w - 540 - mx), mx + 6, y(r) + 7, 20, ps.text, 400)
     text(g, author, w - 500, y(r) + 7, 19, ps.muted, 400)
     text(g, date, w - 330, y(r) + 7, 19, ps.muted, 400)
     text(g, hash, w - 150, y(r) + 7, 19, ps.muted, 400, mono)
   })
   g.globalAlpha = 1
-}
-
-const fit = (g: G, s: string, max: number) => {
-  while (s.length > 4 && g.measureText(s).width > max) s = s.slice(0, -2)
-  return s
 }
 
 function icon(g: G, kind: number, x: number, y: number) {
@@ -421,18 +447,21 @@ function dialog(g: G, title: string, lines: string[], listTitle: string, list: s
   const { width: w } = g.canvas
   const x = w / 2 - 330
   const ly = 214 + lines.length * 30 + 10
-  const by = ly + 46 + list.length * 30 + 40
+  const by = ly + 60 + list.length * 30 + 36
   box(g, 0, 0, w, g.canvas.height, '#000000aa')
   box(g, x, 120, 660, by - 120 + 76, '#141414', 18)
   text(g, title, x + 32, 172, 28, '#fafafa', 700)
   lines.forEach((line, i) => text(g, line, x + 32, 214 + i * 30, 19, '#a3a3a3', 400))
-  box(g, x + 32, ly, 596, 46 + list.length * 30, '#0d0d0d', 12)
+  box(g, x + 32, ly, 596, 60 + list.length * 30, '#0d0d0d', 12)
   text(g, listTitle, x + 50, ly + 34, 20, '#fafafa', 600)
   list.forEach((item, i) => text(g, item, x + 50, ly + 68 + i * 30, 18, '#a3a3a3', 400, mono))
-  box(g, x + 380, by, 96, 46, '#1c1c1c', 10)
-  text(g, 'Cancel', x + 398, by + 30, 19, '#fafafa', 500)
-  box(g, x + 488, by, 140, 46, danger ? (pressed ? '#7f1d1d' : '#3b1414') : pressed ? '#d4d4d4' : '#fafafa', 10)
-  text(g, action, x + 500, by + 30, 19, danger ? '#f87171' : '#111', 600)
+  g.font = `600 19px ${sans}`
+  const aw = g.measureText(action).width + 36
+  const ax = x + 628 - aw
+  box(g, ax - 108, by, 96, 46, '#1c1c1c', 10)
+  text(g, 'Cancel', ax - 90, by + 30, 19, '#fafafa', 500)
+  box(g, ax, by, aw, 46, danger ? (pressed ? '#7f1d1d' : '#3b1414') : pressed ? '#d4d4d4' : '#fafafa', 10)
+  text(g, action, ax + 18, by + 30, 19, danger ? '#f87171' : '#111', 600)
 }
 
 const span = (p: number, from: number, to: number) => Math.min(1, Math.max(0, (p - from) / (to - from)))
@@ -576,5 +605,8 @@ export const source: Paint = (g, k, p) => {
     return
   }
   code(g, ["{step === 'photos' && <EarlyCardPhotos />}", "{step === 'review' && <PatientReview />}", "{step === 'form' && <IntakeForm />}"], 30, 440, 19)
-  if (k === 1) box(g, 70, 466, 440 * p, 3, ps.red)
+  if (k === 1) {
+    g.font = `400 19px ${mono}`
+    box(g, 30 + 19 * 2.4, 462, g.measureText("{step === 'review' && <PatientReview />}").width * p, 3, ps.red)
+  }
 }
