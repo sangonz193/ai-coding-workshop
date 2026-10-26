@@ -78,3 +78,13 @@ export const answers: [question: string, answer: string][] = [
   ['Did it make you faster?', 'The only thing I measured is the review loop. The rest is my experience, not data.'],
   ['Do you still write code?', 'Rarely. VS Code opens less than once a week, mostly to read a file.'],
 ]
+
+// Seconds per step, chapter by chapter; about 35 minutes in total.
+export const budgets: number[][] = [
+  [90],
+  [60, 50, 60, 70, 50, 80, 70, 60, 120, 120, 120],
+  [70, 80, 60, 90],
+  [80, 90, 100, 80],
+  [60, 70, 90, 70, 100],
+  [40, 80],
+]

@@ -36,7 +36,7 @@ pnpm dev        # http://localhost:4313
 ```
 
 - `/` is the audience view. It follows the presenter, can switch to independent exploration, and can rejoin the live scene. Dragging turns the view; scrolling, pinching or `+`/`-` zooms, and both reset when the presenter moves on.
-- `/presenter.html` has previous/next, chapter selection, step reveals, speaker notes, the next caption, prepared answers to likely audience questions, and a join code toggle (Q) that puts the QR code back on large screens mid-talk. The talk opens on a join screen with that QR code.
+- `/presenter.html` has previous/next, chapter selection, step reveals, speaker notes, the next caption, prepared answers to likely audience questions, and a join code toggle (Q) that puts the QR code back on large screens mid-talk, and a pacing readout: a talk clock that starts when you leave the join screen, how far ahead or behind the plan you are, and a bar for the time spent on the current step against its budget (budgets are in `src/story.ts`, about 35 minutes in total). The talk opens on a join screen with that QR code.
 
 The presenter's position is shared through a private Supabase Realtime channel using presence, so audience devices that join late land on the current step. Anyone can follow; only signed-in users can move the talk, and signups are disabled.
 

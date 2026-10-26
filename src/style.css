@@ -67,6 +67,13 @@ button:hover, select:hover { background: #fff; }
 .current { font-size: 1.15rem; line-height: 1.45; }
 .notes { font-size: 1.3rem; line-height: 1.5; }
 .counter { opacity: 0.75; font-size: 0.9rem; }
+.pace p { margin: 0.25rem 0; }
+.pace-bar { height: 8px; overflow: hidden; border-radius: 4px; background: #ffffff1a; }
+.pace-bar span { display: block; height: 100%; background: #6f9a5b; transition: width 1s linear; }
+.pace[data-state='over'] .pace-bar span { background: #e5b45b; }
+.pace[data-state='late'] .pace-bar span { background: #e2675b; }
+#pace-drift[data-state='behind'] { color: #e2675b; }
+#pace-drift[data-state='ahead'] { color: #8fc27a; }
 .answers details { border-top: 1px solid #ffffff1a; padding: 0.6rem 0; }
 .answers summary { cursor: pointer; font-weight: 600; }
 .answers p { margin: 0.5rem 0 0; line-height: 1.45; opacity: 0.85; }
@@ -74,3 +81,4 @@ button:hover, select:hover { background: #fff; }
   .presenter .layout { grid-template-columns: 1fr; grid-template-rows: 45dvh minmax(0, 1fr); }
   .caption { left: 0.75rem; right: 0.75rem; bottom: 0.75rem; padding: 1rem 1.1rem; }
 }
+@media (prefers-reduced-motion: reduce) { .pace-bar span { transition: none; } }

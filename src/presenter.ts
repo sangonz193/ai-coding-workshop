@@ -1,6 +1,7 @@
 import './style.css'
 import { $, deck } from './deck'
 import { indexOf, move, stops, welcome, type Position } from './state'
+import { budget, clock, drift, planned } from './pace'
 import { answers, scenes } from './story'
 import { join, latest, latestQr, onLive, publish, supabase } from './sync'
 import { createWorkshop } from './workshop'
@@ -19,8 +20,37 @@ function toggleQr() {
   show(here)
 }
 
+const timing = 'harness-training:clock'
+let pace: { start: number | null; stepAt: number; index: number } = JSON.parse(localStorage.getItem(timing) ?? 'null') ?? { start: null, stepAt: 0, index: 0 }
+
+function track(p: Position) {
+  const now = Date.now()
+  if (p === welcome) pace = { start: null, stepAt: now, index: 0 }
+  else if (pace.index !== indexOf(p)) pace = { start: pace.start ?? now, stepAt: now, index: indexOf(p) }
+  localStorage.setItem(timing, JSON.stringify(pace))
+}
+
+function renderPace() {
+  $('pace').hidden = here === welcome || pace.start === null
+  if (pace.start === null) return
+  const now = Date.now()
+  const elapsed = (now - pace.start) / 1000
+  const onStep = (now - pace.stepAt) / 1000
+  const behind = drift(here, elapsed, onStep)
+  $('pace-time').textContent = `${clock(elapsed)} of ${clock(planned)}`
+  $('pace-drift').textContent = Math.abs(behind) < 15 ? 'On time' : `${clock(behind)} ${behind > 0 ? 'behind' : 'ahead'}`
+  $('pace-drift').dataset.state = Math.abs(behind) < 15 ? 'on' : behind > 0 ? 'behind' : 'ahead'
+  const share = onStep / budget(here)
+  $('pace-fill').style.width = `${Math.min(100, share * 100)}%`
+  $('pace').dataset.state = share > 1.3 ? 'late' : share > 1 ? 'over' : 'ok'
+  $('pace-step').textContent = `${clock(onStep)} of ${clock(budget(here))} on this step`
+}
+setInterval(renderPace, 1000)
+
 function show(p: Position) {
   here = p
+  track(p)
+  renderPace()
   render(p)
   stage?.show(p)
   const next = move(p, 1)
