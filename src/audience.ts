@@ -18,7 +18,7 @@ function show(p: Position) {
   render(p)
   stage?.show(p)
   $('follow').textContent = following ? 'Explore on my own' : 'Rejoin live'
-  $('status').textContent = following ? 'Following the speaker' : 'Exploring on your own. Drag the workshop to look around.'
+  $('status').textContent = following ? 'Following the speaker' : 'Exploring on your own. Drag the desks to look around.'
 }
 
 $('follow').onclick = () => {
