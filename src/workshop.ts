@@ -45,11 +45,13 @@ export function createWorkshop(host: HTMLElement) {
   scene.background = new THREE.Color(0x221a15)
   scene.add(new THREE.HemisphereLight(0xffe9cc, 0x3b2a1f, 1.3))
   const sun = new THREE.DirectionalLight(0xffd29a, 2.6)
-  sun.position.set(-8, 18, 10)
+  const sunOffset = new THREE.Vector3(-8, 18, 10)
   sun.castShadow = true
-  sun.shadow.mapSize.set(2048, 2048)
-  Object.assign(sun.shadow.camera, { left: -24, right: 24, top: 24, bottom: -24 })
-  sun.shadow.camera.updateProjectionMatrix()
+  sun.shadow.mapSize.set(4096, 4096)
+  sun.shadow.radius = 4
+  sun.shadow.bias = -0.0005
+  sun.shadow.normalBias = 0.02
+  scene.add(sun.target)
   scene.add(sun)
 
   const props: Prop[] = []
@@ -294,6 +296,12 @@ export function createWorkshop(host: HTMLElement) {
     const reach = Math.cos(view.pitch) * 40
     camera.position.set(focus.x + Math.sin(view.turn) * reach, focus.y + Math.sin(view.pitch) * 40, focus.z + Math.cos(view.turn) * reach)
     camera.lookAt(focus)
+    // The shadow map only covers what is on screen, so close-ups get sharp shadows and the overview still fits.
+    const lit = THREE.MathUtils.clamp(9 / camera.zoom, 4, 26)
+    sun.position.copy(focus).add(sunOffset)
+    sun.target.position.copy(focus)
+    Object.assign(sun.shadow.camera, { left: -lit, right: lit, top: lit, bottom: -lit })
+    sun.shadow.camera.updateProjectionMatrix()
     camera.updateProjectionMatrix()
     renderer.render(scene, camera)
   })
