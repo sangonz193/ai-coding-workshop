@@ -282,17 +282,35 @@ export const vscode: Paint = (g, k, p) => {
   vsPanel(g, 'AGENT 3 · search', x + 16, 346, right - 32, [['tool', 'Editing settings.tsx']])
 }
 
-const worktreeNames = ['main', 'dark-mode', 'card-photos', 'nav-fix', 'search', 'login-redirect', 'orchestrator', 'worktree-2', 'envwire · main', 'git-nav · main']
+const copies = [
+  ['eupersona', 'main', 'Review open PRs'], ['eupersona-dark-mode', 'dark-mode', 'Add dark mode'], ['eupersona-login', 'login-redirect', 'Fix login redirect'],
+  ['eupersona-search', 'search', 'Add search filters'], ['eupersona-card-photos', 'card-photos', 'Card photo step'], ['eupersona-nav-fix', 'nav-fix', 'Restore back button'],
+  ['eupersona-orchestrator', 'orchestrator', 'Coordinate agents'], ['eupersona-deps', 'worktree-2', 'Update dependencies'], ['envwire', 'main', 'Add gap check'], ['git-nav', 'main', 'Fast-forward dialog'],
+]
 
 export const vscodeWindow = (i: number): Paint => (g) => {
   const { width: w, height: h } = g.canvas
+  const [folder, branch, task] = copies[i]
   box(g, 0, 0, w, h, '#1e1e1e')
-  box(g, 0, 0, w, 40, '#3c3c3c')
-  ;['#ec6a5e', '#f4bf4f', '#61c554'].forEach((f, j) => box(g, 14 + j * 22, 13, 13, 13, f, 7))
-  text(g, `eupersona · ${worktreeNames[i]}`, 92, 27, 18, '#cccccc', 400)
-  box(g, 0, 40, 34, h - 40, '#333333')
-  box(g, 34, 40, 140, h - 40, '#252526')
-  for (let j = 0; j < 7; j++) box(g, 196, 66 + j * 30, Math.min(w - 220, 120 + ((i * 37 + j * 53) % 240)), 12, j % 3 ? '#3a6ea5' : '#9cdcfe', 6)
+  box(g, 0, 0, w, 44, '#3c3c3c')
+  ;['#ec6a5e', '#f4bf4f', '#61c554'].forEach((f, j) => box(g, 16 + j * 24, 15, 14, 14, f, 7))
+  g.font = `500 22px ${sans}`
+  text(g, fit(g, `~/Developer/${folder}`, w - 220), 110, 30, 22, '#ffffff', 500)
+  box(g, 0, 44, 40, h - 76, '#333333')
+  box(g, 40, 44, 230, h - 76, '#252526')
+  g.font = `700 18px ${sans}`
+  text(g, fit(g, folder.toUpperCase(), 200), 54, 78, 18, '#cccccc', 700)
+  ;['settings', '  theme.tsx', 'auth', '  login.tsx', 'package.json'].forEach((f, j) => text(g, f, 58, 114 + j * 32, 19, '#cccccc', 400))
+  for (let j = 0; j < 6; j++) box(g, 290, 76 + j * 32, 90 + ((i * 37 + j * 53) % 130), 12, j % 3 ? '#3a6ea5' : '#9cdcfe', 6)
+  box(g, w - 260, 44, 260, h - 76, '#252526')
+  text(g, 'AGENT', w - 242, 78, 16, '#bbbbbb', 700)
+  g.font = `400 19px ${sans}`
+  const tw = Math.min(g.measureText(task).width + 28, 228)
+  box(g, w - 16 - tw, 96, tw, 40, '#1f1f1f', 10)
+  text(g, fit(g, task, 200), w - 2 - tw, 123, 19, '#ececec', 400)
+  text(g, 'Working…', w - 242, 170, 18, '#cccccc', 400)
+  box(g, 0, h - 32, w, 32, '#007acc')
+  text(g, `⎇ ${branch}`, 16, h - 10, 18, '#ffffff', 600)
 }
 
 const codeChat: Item[] = [['user', 'Fix the login redirect'], ['tool', 'Read  app/login/page.tsx'], ['ai', 'Fixed. 2 files changed.']]
