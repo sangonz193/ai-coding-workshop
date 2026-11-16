@@ -4,8 +4,8 @@ import { find, newest, stops, type Live, type Position } from './state'
 export const supabase = import.meta.env.VITE_SUPABASE_URL
   ? createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY)
   : undefined
-const topic = 'harness-training'
-const key = 'harness-training:published'
+const topic = 'ai-coding-workshop'
+const key = 'ai-coding-workshop:published'
 const listeners: ((p: Position, qr: boolean) => void)[] = []
 
 function published() {

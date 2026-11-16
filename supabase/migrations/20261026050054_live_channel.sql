@@ -2,7 +2,7 @@ create policy "anyone can follow the talk"
 on realtime.messages for select
 to anon, authenticated
 using (
-  (select realtime.topic()) = 'harness-training'
+  (select realtime.topic()) = 'ai-coding-workshop'
   and realtime.messages.extension in ('broadcast', 'presence')
 );
 
@@ -11,6 +11,6 @@ create policy "presenters drive the talk"
 on realtime.messages for insert
 to authenticated
 with check (
-  (select realtime.topic()) = 'harness-training'
+  (select realtime.topic()) = 'ai-coding-workshop'
   and realtime.messages.extension in ('broadcast', 'presence')
 );

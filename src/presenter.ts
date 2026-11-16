@@ -20,7 +20,7 @@ function toggleQr() {
   show(here)
 }
 
-const timing = 'harness-training:clock'
+const timing = 'ai-coding-workshop:clock'
 let pace: { start: number | null; stepAt: number; index: number } = JSON.parse(localStorage.getItem(timing) ?? 'null') ?? { start: null, stepAt: 0, index: 0 }
 
 function track(p: Position) {
