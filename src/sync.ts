@@ -1,7 +1,9 @@
-import { createClient, type RealtimeChannel } from '@supabase/supabase-js'
+import { createClient, type RealtimeChannel, type SupabaseClient } from '@supabase/supabase-js'
 import { find, newest, stops, type Live, type Position } from './state'
 
-export const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY)
+export const supabase = import.meta.env.VITE_SUPABASE_URL
+  ? createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY)
+  : undefined
 const topic = 'harness-training'
 const key = 'harness-training:published'
 const listeners: ((p: Position, qr: boolean) => void)[] = []
@@ -36,8 +38,8 @@ function track() {
   if (current) channel?.track(current)
 }
 
-function connect() {
-  const mine = supabase.channel(topic, { config: { private: true } })
+function connect(client: SupabaseClient) {
+  const mine = client.channel(topic, { config: { private: true } })
   channel = mine
   mine.on('presence', { event: 'sync' }, () => receive(newest(Object.values(mine.presenceState()).flat())))
   mine.on('broadcast', { event: 'step' }, ({ payload }) => receive(newest([payload])))
@@ -48,13 +50,14 @@ function connect() {
       return
     }
     channel = undefined
-    void supabase.removeChannel(mine).finally(() => setTimeout(connect, 2000))
+    void client.removeChannel(mine).finally(() => setTimeout(() => connect(client), 2000))
   })
 }
 
 export function join(asPresenter = false) {
   presenting = asPresenter
-  if (!channel) connect()
+  if (!supabase) return
+  if (!channel) connect(supabase)
   else if (asPresenter) track()
 }
 

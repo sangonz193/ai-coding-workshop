@@ -5,10 +5,10 @@ export const $ = (id: string) => document.getElementById(id)!
 
 const keys: Record<string, number> = { ArrowRight: 1, ArrowDown: 1, PageDown: 1, ' ': 1, ArrowLeft: -1, ArrowUp: -1, PageUp: -1 }
 
-export function deck(go: (p: Position) => void) {
+export function deck(go: (p: Position) => void, withJoin = true) {
   let here = stops[0]
   const chapters = $('chapters') as HTMLSelectElement
-  chapters.append(new Option('Join', '-1'), ...scenes.map((s, i) => new Option(`${i + 1}. ${s.chapter}`, String(i))))
+  chapters.append(...(withJoin ? [new Option('Join', '-1')] : []), ...scenes.map((s, i) => new Option(`${i + 1}. ${s.chapter}`, String(i))))
   chapters.onchange = () => go(find({ scene: +chapters.value, step: 0 })!)
   $('prev').onclick = () => go(move(here, -1))
   $('next').onclick = () => go(move(here, 1))

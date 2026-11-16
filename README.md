@@ -49,4 +49,8 @@ Supabase runs locally in Docker and is reached through one Cloudflare tunnel wit
 3. `pnpm exec supabase start`, then `pnpm presenter` once to create a presenter account.
 4. `docker compose up -d` starts the tunnel; `pnpm build && pnpm preview` serves the app.
 
+## Self-guided build
+
+Without `VITE_SUPABASE_URL` the audience view is self-guided: it opens on the first scene, skips the join screen and has no follow mode, and the presenter page works without signing in. `VITE_SUPABASE_URL= pnpm build` produces this version; asset URLs are relative, so `dist` can be served from any path.
+
 `pnpm test` covers scene navigation and choosing the live position; `pnpm build` type-checks and builds both pages.

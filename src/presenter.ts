@@ -84,20 +84,23 @@ onLive((p, live) => {
 })
 show(here)
 
-const signin = $('signin') as HTMLFormElement
-const { data } = await supabase.auth.getSession()
-if (data.session) join(true)
-else {
-  signin.hidden = false
-  signin.onsubmit = async (e) => {
-    e.preventDefault()
-    const { error } = await supabase.auth.signInWithPassword({
-      email: ($('email') as HTMLInputElement).value,
-      password: ($('password') as HTMLInputElement).value,
-    })
-    $('signin-error').textContent = error?.message ?? ''
-    if (error) return
-    signin.hidden = true
-    join(true)
+if (supabase) {
+  const { auth } = supabase
+  const { data } = await auth.getSession()
+  if (data.session) join(true)
+  else {
+    const signin = $('signin') as HTMLFormElement
+    signin.hidden = false
+    signin.onsubmit = async (e) => {
+      e.preventDefault()
+      const { error } = await auth.signInWithPassword({
+        email: ($('email') as HTMLInputElement).value,
+        password: ($('password') as HTMLInputElement).value,
+      })
+      $('signin-error').textContent = error?.message ?? ''
+      if (error) return
+      signin.hidden = true
+      join(true)
+    }
   }
 }
